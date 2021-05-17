@@ -35,7 +35,7 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css"
-    })
+    }),
     new CopyWebpackPlugin({
       patterns: [
         { from: './src/assets', to : 'assets' }
