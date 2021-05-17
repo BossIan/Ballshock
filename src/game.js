@@ -1,0 +1,1 @@
+import Phaser, {Game} from 'phaser';
