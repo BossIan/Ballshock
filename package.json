@@ -1,68 +1,46 @@
 {
   "name": "ballshock",
-
   "version": "0.0.1",
-
   "description": "Test",
-
   "main": "index.js",
-
   "scripts": {
     "start": "webpack server --mode development --entry ./src/game.js",
-    "build": "webpack --mode production --entry ./src/game.js --output ./dist/game.js",
-    "dev": "webpack --mode development --entry ./src/game.js --output ./dist/game.js"
+    "build": "webpack --mode production --entry ./src/game.js",
+    "dev": "webpack --mode development --entry ./src/game.js"
   },
   "repository": {
-    
     "type": "git",
     "url": "git+https://github.com/BossIan/Ballshock.git"
   },
-
-  "author": 
-    "Cowstock",
-
-  "license":
-   "ISC",
-
+  "author": "Cowstock",
+  "license": "ISC",
   "bugs": {
-
     "url": "https://github.com/BossIan/Ballshock/issues"
-  
   },
-
-  "homepage":
-   "https://github.com/BossIan/Ballshock#readme",
-
+  "homepage": "https://github.com/BossIan/Ballshock#readme",
   "devDependencies": {
-
     "@babel/core": "^7.14.2",
-
     "@babel/preset-env": "^7.14.2",
-
     "babel-loader": "^8.2.2",
-
     "copy-webpack-plugin": "^8.1.1",
-
     "css-loader": "^5.2.4",
-
     "html-loader": "^2.1.2",
-
     "html-webpack-plugin": "^5.3.1",
-
     "mini-css-extract-plugin": "^1.6.0",
-
     "webpack": "^5.37.0",
-
     "webpack-cli": "^4.7.0",
-
     "webpack-dev-server": "^3.11.2"
-  
   },
-
   "dependencies": {
-
-    "phaser": "^3.54.0"
-  
+    "express": "^4.17.1",
+    "jquery": "^3.6.0",
+    "phaser": "^3.54.0",
+    "socket.io": "^4.1.1",
+    "socket.io-client": "^4.1.1",
+    "socket.io-redis": "^6.1.0"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.3",
+    "utf-8-validate": "^5.0.5"
   }
-
 }

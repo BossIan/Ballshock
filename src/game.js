@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import testlevel from './scenes/testlevel';
-var width = 1280;
-var height = 720;
+import multilevel from './scenes/multilevel';
+var width = 2120;
+var height = 1200;
 var config;
 config = {
     type: Phaser.AUTO,
@@ -16,15 +17,15 @@ config = {
     transparent: false,
     expandParent: true,
     gameTitle: "Ballshock",
-    gameVersion: "0.0.0.2",
+    gameVersion: "0.0.0.5",
     pixelArt: true,
     physics: {
         default: 'arcade',
         arcade: {
             debug: false,
-            gravity: {y: 600}
+            gravity: {y: 800}
         }
     },
-    scene:[testlevel]
+    scene:[testlevel, multilevel]
 };
 var game = new Phaser.Game(config);

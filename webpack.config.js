@@ -3,6 +3,9 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
+  devServer: {
+  host: '192.168.0.2',
+},
   module: {
     rules: [
       {
