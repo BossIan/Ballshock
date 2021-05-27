@@ -17,7 +17,7 @@ config = {
     transparent: false,
     expandParent: true,
     gameTitle: "Ballshock",
-    gameVersion: "0.0.0.5",
+    gameVersion: "0.0.0.6",
     pixelArt: true,
     physics: {
         default: 'arcade',

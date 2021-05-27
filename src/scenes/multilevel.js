@@ -22,12 +22,14 @@ var spawned = false;
 var player;
 var otherbullets;
 var otherbullet;
+var thebullet;
 var bullet1;
 var bullet2;
 var bullet3;
 var bullet4;
 var bullet5;
 var bullet6;
+var bullet7;
 var bulletcooldown = 0;
 var bullets;
 var Health = 100;
@@ -38,7 +40,8 @@ export default class multilevel extends Phaser.Scene {
   }
 	preload(){
     this.load.setPath('assets/');
-    this.load.spritesheet('character1', 'character1.png', {frameWidth: 55, frameHeight: 55})
+    this.load.spritesheet('character1', 'character1.png', {frameWidth: 35, frameHeight: 35})
+    this.load.spritesheet('walljump1', 'walljump1.png', {frameWidth: 35, frameHeight: 35})
     this.load.image('gun1', 'gun1.png')
     this.load.image('bullet1', 'bullet1.png')
     this.load.image('floor', 'floor.png')
@@ -70,7 +73,7 @@ export default class multilevel extends Phaser.Scene {
     socket = io('http://192.168.193.222:8081/');
     otherbullets = this.physics.add.group();
     this.otherPlayers = this.physics.add.group();
-    healthtext = this.add.text(460, 265,"Health = " + Health).setScrollFactor(0).setDepth(2);
+    healthtext = this.add.text(500, 100,"Health = " + Health).setScrollFactor(0).setDepth(3);
     function addPlayer(self, playerInfo) {
       character = self.physics.add.sprite(80, 1100, 'character1', 0)
       var camera = self.cameras.main;
@@ -78,7 +81,7 @@ export default class multilevel extends Phaser.Scene {
       camera.setBounds(0, 0, 2120, 1200)
       camera.startFollow(character);
       character.anims.play('dash')
-      gun = self.add.image(character.x, character.y, 'gun1');
+      gun = self.add.image(character.x, character.y, 'gun1').setDepth(1);
       character.body.collideWorldBounds = true;
       spawned = true;
 //character collider
@@ -97,9 +100,8 @@ export default class multilevel extends Phaser.Scene {
     }
     function addOtherPlayers(self, playerInfo) {
       otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'character1', 0)
-      otherbullet = otherbullets.create(playerInfo.x, playerInfo.y + 13, 'bullet1')
-      otherbullet.setActive(playerInfo.bulletactive);
-      otherbullet.setVisible(playerInfo.bulletactive);
+      otherbullet = otherbullets.create(playerInfo.x, playerInfo.y + 13, 'bullet1');
+      otherbullet.body.allowGravity = false;
       otherGun = self.add.image(50, 50, 'gun1')
       otherPlayer.playerId = playerInfo.playerId;
       self.otherPlayers.add(otherPlayer);
@@ -201,14 +203,6 @@ export default class multilevel extends Phaser.Scene {
         }
       });
     });
-    socket.on('bulletshotted', function (playerInfo) {
-      self.otherPlayers.getChildren().forEach(function (otherPlayer) {
-        if (playerInfo.playerId === otherPlayer.playerId) {
-          otherbullet.setActive(playerInfo.bulletactive);
-          otherbullet.setVisible(playerInfo.bulletactive);
-        }
-      });
-    });
     socket.on('playerMoved', function (playerInfo) {
       self.otherPlayers.getChildren().forEach(function (otherPlayer) {
         if (playerInfo.playerId === otherPlayer.playerId) {
@@ -220,7 +214,15 @@ export default class multilevel extends Phaser.Scene {
     socket.on('bulletMovemented', function (playerInfo) {
       self.otherPlayers.getChildren().forEach(function (otherPlayer) {
         if (playerInfo.playerId === otherPlayer.playerId) {
-          otherbullet.setPosition(playerInfo.bulletx, playerInfo.bullety - 160)
+          otherbullet.setPosition(playerInfo.bulletx, playerInfo.bullety)
+        }
+      });
+    });
+    socket.on('bulletshotted', function (playerInfo) {
+      self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+        if (playerInfo.playerId === otherPlayer.playerId) {
+          otherbullet.setActive(playerInfo.bulletactive);
+          otherbullet.setVisible(playerInfo.bulletactive);
         }
       });
     });
@@ -265,39 +267,13 @@ export default class multilevel extends Phaser.Scene {
       frameRate: 5,
       frames: this.anims.generateFrameNumbers('character1')
 });
-//colliders
-      this.physics.add.overlap(floors, bullet1, bullethitfloor1)
-      this.physics.add.overlap(floors, bullet2, bullethitfloor2)
-      this.physics.add.overlap(floors, bullet3, bullethitfloor3)
-      this.physics.add.overlap(floors, bullet4, bullethitfloor4)
-      this.physics.add.overlap(floors, bullet5, bullethitfloor5)
-      this.physics.add.overlap(floors, bullet6, bullethitfloor6)
-      function bullethitfloor1() {
-        socket.emit('bullethit')
-        bullet1.setActive(false);
-        bullet1.setVisible(false);
-      }
-      function bullethitfloor2() {
-        bullet2.setActive(false);
-        bullet2.setVisible(false);
-      }
-      function bullethitfloor3() {
-        bullet3.setActive(false);
-        bullet3.setVisible(false);
-      }
-      function bullethitfloor4() {
-        bullet4.setActive(false);
-        bullet4.setVisible(false);
-      }
-      function bullethitfloor5() {
-        bullet5.setActive(false);
-        bullet5.setVisible(false);
-      }
-      function bullethitfloor6() {
-        bullet6.setActive(false);
-        bullet6.setVisible(false);
-      }
-      //floors
+this.anims.create({
+  key: 'walljump',
+  repeat: 0,
+  frameRate: 5,
+  frames: this.anims.generateFrameNumbers('walljump1')
+});
+//floors
           var floors = this.physics.add.staticGroup()
           floors.create(20, 1180, 'floor_small');
       for (var i = 0; i < 2; i++) {
@@ -849,6 +825,37 @@ export default class multilevel extends Phaser.Scene {
             bullet7.setVisible(false);
             bullet7.body.allowGravity = false;
 //colliders
+      this.physics.add.overlap(floors, bullet1, bullethitfloor1)
+      this.physics.add.overlap(floors, bullet2, bullethitfloor2)
+      this.physics.add.overlap(floors, bullet3, bullethitfloor3)
+      this.physics.add.overlap(floors, bullet4, bullethitfloor4)
+      this.physics.add.overlap(floors, bullet5, bullethitfloor5)
+      this.physics.add.overlap(floors, bullet6, bullethitfloor6)
+      function bullethitfloor1() {
+        socket.emit('bullethit')
+        bullet1.setActive(false);
+        bullet1.setVisible(false);
+      }
+      function bullethitfloor2() {
+        bullet2.setActive(false);
+        bullet2.setVisible(false);
+      }
+      function bullethitfloor3() {
+        bullet3.setActive(false);
+        bullet3.setVisible(false);
+      }
+      function bullethitfloor4() {
+        bullet4.setActive(false);
+        bullet4.setVisible(false);
+      }
+      function bullethitfloor5() {
+        bullet5.setActive(false);
+        bullet5.setVisible(false);
+      }
+      function bullethitfloor6() {
+        bullet6.setActive(false);
+        bullet6.setVisible(false);
+      }
 //key on
     key_R.on('down', function () {
       Health = 100
@@ -862,6 +869,28 @@ export default class multilevel extends Phaser.Scene {
     })
     key_2.on('down', function () {
       CanMove = true;
+    })
+    key_Space.on('down', function () {
+      if (CanMove == true) {
+        if (character.body.touching.left && character.body.touching.down != true) {
+          CanMove = false;
+          character.setVelocityX(200);
+          character.setVelocityY(-250);
+          character.anims.play('walljump');
+          character.on('animationcomplete', function () {
+            CanMove = true;
+         })
+        }
+        else if (character.body.touching.right && character.body.touching.down != true) {
+          CanMove = false;
+          character.setVelocityX(-200);
+          character.setVelocityY(-250);
+          character.anims.play('walljump');
+          character.on('animationcomplete', function () {
+            CanMove = true;
+         })
+        }
+      }
     })
     key_Shift.on('down', function () {
       //dash
@@ -888,82 +917,10 @@ export default class multilevel extends Phaser.Scene {
     })
 	}
   update(){
-//bullets
-    if (bullet1.x > 1280) {
-  bullet1.setActive(false);
-  bullet1.setVisible(false);
-}
-    else if (bullet1.x < 0) {
-  bullet1.setActive(false);
-  bullet1.setVisible(false);
-}
-    else if (bullet1.y > 720) {
-  bullet1.setActive(false);
-  bullet1.setVisible(false);
-}
-    if (bullet2.x > 1280) {
-  bullet2.setActive(false);
-  bullet2.setVisible(false);
-}
-    else if (bullet2.x < 0) {
-  bullet2.setActive(false);
-  bullet2.setVisible(false);
-}
-    else if (bullet2.y > 720) {
-  bullet2.setActive(false);
-  bullet2.setVisible(false);
-}
-    if (bullet3.x > 1280) {
-  bullet3.setActive(false);
-  bullet3.setVisible(false);
-}
-    else if (bullet3.x < 0) {
-  bullet3.setActive(false);
-  bullet3.setVisible(false);
-}
-    else if (bullet3.y > 720) {
-  bullet3.setActive(false);
-  bullet3.setVisible(false);
-}
-    if (bullet4.x > 1280) {
-  bullet4.setActive(false);
-  bullet4.setVisible(false);
-}
-    else if (bullet4.x < 0) {
-  bullet4.setActive(false);
-  bullet4.setVisible(false);
-}
-    else if (bullet4.y > 720) {
-  bullet4.setActive(false);
-  bullet4.setVisible(false);
-}
-    if (bullet5.x > 1280) {
-  bullet5.setActive(false);
-  bullet5.setVisible(false);
-}
-    else if (bullet5.x < 0) {
-  bullet5.setActive(false);
-  bullet5.setVisible(false);
-}
-    else if (bullet5.y > 720) {
-  bullet5.setActive(false);
-  bullet5.setVisible(false);
-}
-    if (bullet6.x > 1280) {
-  bullet1.setActive(false);
-  bullet1.setVisible(false);
-}
-    else if (bullet6.x < 0) {
-  bullet6.setActive(false);
-  bullet6.setVisible(false);
-}
-    else if (bullet6.y > 720) {
-  bullet6.setActive(false);
-  bullet6.setVisible(false);
-}
     if (this.input.activePointer.isDown) {
       if (bulletcooldown <= 0) {
-        var thebullet = bullets.getFirstDead(false);
+        thebullet = bullets.getFirstDead(false);+
+        thebullet.setDepth(1);
         thebullet.x = gun.x;
         thebullet.y = gun.y;
         thebullet.setActive(true);
@@ -981,7 +938,6 @@ export default class multilevel extends Phaser.Scene {
         healthtext.text = ("Press R to respawn")
         character.setActive(false);
         character.setVisible(false);
-        socket.emit('dead')
       }
       else {
         healthtext.text = ("Health = " + Health)
@@ -1055,7 +1011,7 @@ export default class multilevel extends Phaser.Scene {
    if (thebullet) {
      var bulletx = thebullet.x
      var bullety = thebullet.y
-     if (thebullet.oldPosition && (bulletx !== thebullet.oldPosition.x || bullety !== thebullet.oldPosition.y)) {
+     if (thebullet.oldPosition && (bulletx !== thebullet.oldPosition.bulletx)) {
        socket.emit('bulletMovement', { bulletx: thebullet.x, bullety: thebullet.y})
      }
      thebullet.oldPosition = {

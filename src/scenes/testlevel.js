@@ -43,6 +43,7 @@ export default class testlevel extends Phaser.Scene {
 	preload(){
     this.load.setPath('assets/');
     this.load.spritesheet('character1', 'character1.png', {frameWidth: 35, frameHeight: 35})
+    this.load.spritesheet('walljump1', 'walljump1.png', {frameWidth: 35, frameHeight: 35})
     this.load.image('gun1', 'gun1.png')
     this.load.image('bullet1', 'bullet1.png')
     this.load.image('floor', 'floor.png')
@@ -159,7 +160,6 @@ for (var i = 0; i < 2; i++) {
     floors.create(380, 820, 'floor_diag');
     floors.create(420, 900, 'floor_tube_side');
     floors.create(460, 900, 'floor_sidemiddle');
-
     floors.create(140, 700, 'floor_sidemiddle').flipX = true;
     floors.create(180, 700, 'floor_bottom_small').flipX = true;
     floors.create(180, 660, 'floor_diag').flipX = true;
@@ -170,7 +170,6 @@ for (var i = 0; i < 2; i++) {
     floors.create(260, 620, 'floor_triple_small');
     floors.create(260, 580, 'floor_topmiddle');
     floors.create(300, 620, 'floor_sidemiddle');
-
     floors.create(260, 1180, 'floor_small').flipX = true;
     floors.create(260, 1140, 'floor_diag').flipX = true;
     floors.create(300, 1180, 'floor_middle');
@@ -178,11 +177,9 @@ for (var i = 0; i < 2; i++) {
     floors.create(300, 1100, 'floor_topmiddle');
     floors.create(340, 1180, 'floor_small');
     floors.create(340, 1140, 'floor_diag');
-
     floors.create(260, 1020, 'floor_sidemiddle').flipX = true;
     floors.create(300, 1020, 'floor_tube_side')
     floors.create(340, 1020, 'floor_sidemiddle')
-
     floors.create(420, 1060, 'floor_sidemiddle').flipX = true;
     floors.create(460, 1060, 'floor_bottom_small').flipX = true;
     floors.create(460, 1020, 'floor_diag').flipX = true;
@@ -204,7 +201,6 @@ for (var i = 0; i < 2; i++) {
     floors.create(660, 900, 'floor_bottom_small').flipY = true;
     floors.create(700, 900, 'floor_tube_side');
     floors.create(740, 900, 'floor_sidemiddle');
-
     floors.create(380, 660, 'floor_sidemiddle').flipX = true;
     floors.create(420, 660, 'floor_bottom_small').flipX = true;
     floors.create(420, 620, 'floor_diag').flipX = true;
@@ -234,7 +230,6 @@ for (var i = 0; i < 4; i++) {
     floors.create(700, 660, 'floor_side_small');
     floors.create(700, 620, 'floor_diag')
     floors.create(740, 660, 'floor_sidemiddle')
-
     floors.create(380, 460, 'floor_sidemiddle').flipX = true;
     floors.create(420, 460, 'floor_bottom_small').flipX = true;
     floors.create(420, 420, 'floor_diag').flipX = true;
@@ -263,7 +258,6 @@ for (var i = 0; i < 2; i++) {
     floors.create(700, 380, 'floor_bottom_small').flipY = true;
     floors.create(740, 380, 'floor_tube_side');
     floors.create(780, 380, 'floor_sidemiddle');
-
     floors.create(620, 1140, 'floor_diag').flipX = true;
     floors.create(700, 1100, 'floor_small').flipX = true;
     floors.create(620, 1180, 'floor_small').flipX = true;
@@ -276,17 +270,14 @@ for (var i = 0; i < 2; i++) {
     floors.create(740, 1140, 'floor_side');
     floors.create(740, 1060, 'floor_side_small_line');
     floors.create(740, 1100, 'floor_side');
-
     floors.create(820, 1060, 'floor_topmiddle').flipY = true;
 for (var i = 0; i < 2; i++) {
     floors.create(820, 1020 - i * 40, 'floor_tube_up');
 }
     floors.create(820, 940, 'floor_topmiddle');
-
     floors.create(740, 820, 'floor_sidemiddle').flipX = true;
     floors.create(780, 820, 'floor_tube_side');
     floors.create(820, 820, 'floor_sidemiddle');
-
     floors.create(900, 1180, 'floor_small').flipX = true;
     floors.create(900, 1140, 'floor_diag').flipX = true;
     floors.create(940, 1180, 'floor_middle');
@@ -297,19 +288,16 @@ for (var i = 0; i < 2; i++) {
     floors.create(980, 1140 - i * 40, 'floor_side');
 }
     floors.create(980, 1060, 'floor_topmiddle');
-
     floors.create(900, 940, 'floor_sidemiddle').flipX = true;
 for (var i = 0; i < 2; i++) {
     floors.create(940 + i * 40, 940, 'floor_tube_side');
 }
     floors.create(1020, 940, 'floor_sidemiddle');
-
     floors.create(940, 820, 'floor_sidemiddle').flipX = true;
 for (var i = 0; i < 5; i++) {
     floors.create(980 + i * 40, 820, 'floor_tube_side');
 }
     floors.create(1180, 820, 'floor_sidemiddle');
-
     floors.create(1060, 700, 'floor_topmiddle').flipY = true;
 for (var i = 0; i < 4; i++) {
     floors.create(1060, 660 - i * 40, 'floor_tube_up');
@@ -333,28 +321,22 @@ for (var i = 0; i < 2; i++) {
     floors.create(1260 + i * 40, 500, 'floor_tube_side');
 }
     floors.create(1340, 500, 'floor_sidemiddle');
-
     floors.create(1060, 1140, 'floor_tube_up');
     floors.create(1060, 1100, 'floor_topmiddle');
-
     floors.create(900, 660, 'floor_sidemiddle').flipX = true;
     floors.create(940, 660, 'floor_tube_side')
     floors.create(980, 660, 'floor_sidemiddle')
-
     floors.create(1100, 940, 'floor_sidemiddle').flipX = true;
 for (var i = 0; i < 2; i++) {
     floors.create(1140 + i * 40, 940, 'floor_tube_side');
 }
     floors.create(1220, 940, 'floor_sidemiddle');
-
     floors.create(1140, 660, 'floor_sidemiddle').flipX = true;
     floors.create(1180, 660, 'floor_tube_side')
     floors.create(1220, 660, 'floor_sidemiddle')
-
     floors.create(1020, 1180, 'floor_front');
     floors.create(1060, 1180, 'floor_middle_small');
     floors.create(1100, 1180, 'floor_front');
-
     floors.create(1140, 1180, 'floor_small').flipX = true;
 for (var i = 0; i < 2; i++) {
     floors.create(1140, 1140 - i * 40, 'floor_side').flipX = true;
@@ -365,7 +347,6 @@ for (var i = 0; i < 2; i++) {
     floors.create(1180, 1100, 'floor_diag');
     floors.create(1220, 1180, 'floor_small');
     floors.create(1220, 1140, 'floor_diag');
-
     floors.create(1380, 1180, 'floor_small').flipX = true;
     floors.create(1380, 1140, 'floor_side').flipX = true;
     floors.create(1380, 1100, 'floor_side').flipX = true;
@@ -380,15 +361,13 @@ for (var i = 0; i < 2; i++) {
     floors.create(1460, 1100, 'floor_diag');
     floors.create(1500, 1180, 'floor_small');
     floors.create(1500, 1140, 'floor_diag');
-
     floors.create(1780, 1180, 'floor_small').flipX = true;
     floors.create(1780, 1140, 'floor_diag').flipX = true;
     floors.create(1820, 1180, 'floor_middle');
     floors.create(1820, 1140, 'floor_middle_small');
     floors.create(1820, 1100, 'floor_topmiddle');
     floors.create(1860, 1180, 'floor_small');
-    floors.create(1860, 1140, 'floor_diag')
-
+    floors.create(1860, 1140, 'floor_diag');
     floors.create(860, 340, 'floor_sidemiddle').flipX = true;
     floors.create(900, 340, 'floor_bottom_small').flipX = true;
     floors.create(900, 300, 'floor_side_small_line').flipX = true;
@@ -397,7 +376,6 @@ for (var i = 0; i < 2; i++) {
     floors.create(940, 300, 'floor_diag');
     floors.create(980, 380, 'floor_topmiddle').flipY = true;
     floors.create(980, 340, 'floor_diag_withsmall');
-
     floors.create(1060, 380, 'floor_topmiddle').flipY = true;
     floors.create(1060, 340, 'floor_tube_up');
     floors.create(1060, 300, 'floor_tube_up');
@@ -415,7 +393,6 @@ for (var i = 0; i < 2; i++) {
     floors.create(1100, 220, 'floor_side_small');
     floors.create(1100, 180, 'floor_diag');
     floors.create(1140, 220, 'floor_sidemiddle');
-
     floors.create(1140, 380, 'floor_topmiddle').flipY = true;
     floors.create(1140, 340, 'floor_diag_withsmall').flipX = true;
     floors.create(1180, 340, 'floor_bottom_small').flipX = true;
@@ -424,7 +401,6 @@ for (var i = 0; i < 2; i++) {
     floors.create(1220, 300, 'floor_side_small_line');
     floors.create(1220, 260, 'floor_topmiddle');
     floors.create(1260, 340, 'floor_sidemiddle');
-
     floors.create(1340, 380, 'floor_sidemiddle').flipX = true;
     floors.create(1380, 380, 'floor_tube_side');
     var floorflip5 = floors.create(1420, 380, 'floor_bottom_small');
@@ -460,7 +436,6 @@ for (var i = 0; i < 2; i++) {
     floors.create(1700, 420, 'floor_diag');
     floors.create(1700, 460, 'floor_bottom_small');
     floors.create(1740, 460, 'floor_sidemiddle');
-
     floors.create(1380, 660, 'floor_sidemiddle').flipX = true;
     var floorflip9 = floors.create(1420, 700, 'floor_diag');
     floorflip9.flipX = true;
@@ -485,11 +460,9 @@ for (var i = 0; i < 4; i++) {
     floors.create(1700, 660, 'floor_bottom_small');
     floors.create(1700, 620, 'floor_diag');
     floors.create(1740, 660, 'floor_sidemiddle');
-
     floors.create(1300, 820, 'floor_sidemiddle').flipX = true;
     floors.create(1340, 820, 'floor_tube_side');
     floors.create(1380, 820, 'floor_sidemiddle');
-
     floors.create(1380, 900, 'floor_sidemiddle').flipX = true;
     floors.create(1420, 900, 'floor_tube_side');
     var floorflip10 = floors.create(1460, 900, 'floor_bottom_small');
@@ -695,13 +668,35 @@ for (var i = 0; i < 6; i++) {
     key_2.on('down', function () {
       CanMove = true;
     })
+    key_Space.on('down', function () {
+      if (CanMove == true) {
+        if (character.body.touching.left && character.body.touching.down != true) {
+          CanMove = false;
+          character.setVelocityX(200);
+          character.setVelocityY(-250);
+          character.anims.play('walljump');
+          character.on('animationcomplete', function () {
+            CanMove = true;
+         })
+        }
+        else if (character.body.touching.right && character.body.touching.down != true) {
+          CanMove = false;
+          character.setVelocityX(-200);
+          character.setVelocityY(-250);
+          character.anims.play('walljump');
+          character.on('animationcomplete', function () {
+            CanMove = true;
+         })
+        }
+      }
+    })
     key_Shift.on('down', function () {
       //dash
       if (CanMove == true) {
           if (character.body.velocity.x > 0) {
             CanMove = false;
             character.setVelocityX(350);
-            character.anims.play('dash')
+            character.anims.play('dash');
             character.on('animationcomplete', function () {
               CanMove = true
               character.setVelocityX(200);
@@ -755,6 +750,7 @@ for (var i = 0; i < 6; i++) {
        character.setVelocityX(0);
      }
      if (key_Space.isDown) {
+       console.log(character.body.touching.left);
        if (character.body.touching.down) {
          character.setVelocityY(-400);
        }
