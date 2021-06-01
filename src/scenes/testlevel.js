@@ -22,7 +22,8 @@ var bullet6;
 var bullet7;
 var bulletcooldown = 0;
 var bullets;
-
+var Health = 100;
+var healthtext;
 
 
 
@@ -81,6 +82,7 @@ export default class testlevel extends Phaser.Scene {
     character = this.physics.add.sprite(80, 1100, 'character1', 0)
     var camera = this.cameras.main;
     camera.setZoom(2.5)
+    healthtext = this.add.text( 1000, 500,"Health = " + Health).setScrollFactor(0).setDepth(3);
     camera.setBounds(0, 0, 2120, 1200)
     camera.startFollow(character);
     character.body.collideWorldBounds = true;
@@ -623,7 +625,7 @@ for (var i = 0; i < 6; i++) {
       bullet7.body.allowGravity = false;
 //colliders
     this.physics.add.collider(character, floors);
-    this.physics.add.overlap(floors, bullet1, bullethitfloor1)
+    var ha = this.physics.add.overlap(bullet1, floors, bullethitfloor1)
     this.physics.add.overlap(floors, bullet2, bullethitfloor2)
     this.physics.add.overlap(floors, bullet3, bullethitfloor3)
     this.physics.add.overlap(floors, bullet4, bullethitfloor4)

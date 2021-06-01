@@ -46,6 +46,10 @@ socket.on('bullethit', function () {
   players[socket.id].bulletactive = false;
   socket.broadcast.emit('bullethitted', players[socket.id]);
 });
+socket.on('bullethitotherplayer1', function (bullethitdata) {
+  players[socket.id].bulletactive = false;
+  io.to(bullethitdata.id).emit('bullethittedyou', players[socket.id]);
+});
 socket.on('bulletshot', function () {
   players[socket.id].bulletactive = true;
   socket.broadcast.emit('bulletshotted', players[socket.id]);

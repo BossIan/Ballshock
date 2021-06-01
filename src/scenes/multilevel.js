@@ -6,6 +6,8 @@ var key_A;
 var key_S;
 var key_D;
 var key_Space;
+var invincible = false;
+var invincibletimer = 60;
 var testspeed = 0;
 var CanMove = true;
 var key_Q;
@@ -22,6 +24,7 @@ var spawned = false;
 var player;
 var otherbullets;
 var otherbullet;
+var otherPlayerno;
 var thebullet;
 var bullet1;
 var bullet2;
@@ -34,6 +37,7 @@ var bulletcooldown = 0;
 var bullets;
 var Health = 100;
 var healthtext;
+var myid;
 export default class multilevel extends Phaser.Scene {
   constructor(){
     super({key: "multilevel"});
@@ -61,7 +65,17 @@ export default class multilevel extends Phaser.Scene {
     this.load.image('floor_diag_small', 'floor_diag_small.png')
     this.load.image('floor_triple_small', 'floor_triple_small.png')
     this.load.image('floor_side_small_line', 'floor_side_small_line.png')
-    this.load.image('floor_diag_withsmall', 'floor_diag_withsmall.png')
+    this.load.image('floor_vertical1', 'floor_vertical1.png')
+    this.load.image('floor_vertical2', 'floor_vertical2.png')
+    this.load.image('floor_vertical3', 'floor_vertical3.png')
+    this.load.image('floor_vertical4', 'floor_vertical4.png')
+    this.load.image('floor_vertical5', 'floor_vertical5.png')
+    this.load.image('floor_vertical6', 'floor_vertical6.png')
+    this.load.image('floor_vertical7', 'floor_vertical7.png')
+    this.load.image('floor_vertical8', 'floor_vertical8.png')
+    this.load.image('floor_vertical9', 'floor_vertical9.png')
+    this.load.image('floor_vertical10', 'floor_vertical10.png')
+    this.load.image('floor_bigvertical', 'floor_bigvertical.png')
 }
 	create(){
 //multiplayer
@@ -73,9 +87,9 @@ export default class multilevel extends Phaser.Scene {
     socket = io('http://192.168.193.222:8081/');
     otherbullets = this.physics.add.group();
     this.otherPlayers = this.physics.add.group();
-    healthtext = this.add.text(500, 100,"Health = " + Health).setScrollFactor(0).setDepth(3);
     function addPlayer(self, playerInfo) {
-      character = self.physics.add.sprite(80, 1100, 'character1', 0)
+      character = self.physics.add.sprite(80, 1100, 'character1', 0);
+      myid = playerInfo.playerId;
       var camera = self.cameras.main;
       camera.setZoom(2.5)
       camera.setBounds(0, 0, 2120, 1200)
@@ -99,10 +113,18 @@ export default class multilevel extends Phaser.Scene {
       }
     }
     function addOtherPlayers(self, playerInfo) {
-      otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'character1', 0)
+      otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'character1', 0);
+      self.physics.add.overlap(otherPlayer, bullet1, bulletotherplayer1);
+      self.physics.add.overlap(otherPlayer, bullet2, bulletotherplayer2);
+      self.physics.add.overlap(otherPlayer, bullet3, bulletotherplayer3);
+      self.physics.add.overlap(otherPlayer, bullet4, bulletotherplayer4);
+      self.physics.add.overlap(otherPlayer, bullet5, bulletotherplayer5);
+      self.physics.add.overlap(otherPlayer, bullet6, bulletotherplayer6);
+      self.physics.add.overlap(otherPlayer, bullet7, bulletotherplayer7);
       otherbullet = otherbullets.create(playerInfo.x, playerInfo.y + 13, 'bullet1');
+      otherPlayerno = playerInfo.playernumber;
       otherbullet.body.allowGravity = false;
-      otherGun = self.add.image(50, 50, 'gun1')
+      otherGun = self.add.image(playerInfo.x, playerInfo.y + 13, 'gun1')
       otherPlayer.playerId = playerInfo.playerId;
       self.otherPlayers.add(otherPlayer);
       otherPlayer.body.allowGravity = false;
@@ -117,6 +139,55 @@ export default class multilevel extends Phaser.Scene {
       else if (playerInfo.playernumber == 4) {
         otherPlayer.tint = 0x3e13d6
       }
+    }
+    function bulletotherplayer1(body) {
+      if (bullet1.active == true) {
+        bullet1.setActive(false)
+        bullet1.setVisible(false)
+        socket.emit('bullethitotherplayer1', {id :body.playerId})
+      }
+    }
+    function bulletotherplayer2(body) {
+      if (bullet2.active == true) {
+      bullet2.setActive(false)
+      bullet2.setVisible(false)
+      socket.emit('bullethitotherplayer2', {id :body.playerId})
+     }
+    }
+    function bulletotherplayer3(body) {
+      if (bullet3.active == true) {
+      bullet3.setActive(false)
+      bullet3.setVisible(false)
+      socket.emit('bullethitotherplayer3', {id :body.playerId})
+    }
+    }
+    function bulletotherplayer4(body) {
+      if (bullet4.active == true) {
+      bullet4.setActive(false)
+      bullet4.setVisible(false)
+      socket.emit('bullethitotherplayer4', {id :body.playerId})
+    }
+    }
+    function bulletotherplayer5(body) {
+      if (bullet5.active == true) {
+      bullet5.setActive(false)
+      bullet5.setVisible(false)
+      socket.emit('bullethitotherplayer5', {id :body.playerId})
+    }
+    }
+    function bulletotherplayer6(body) {
+      if (bullet6.active == true) {
+      bullet6.setActive(false)
+      bullet6.setVisible(false)
+      socket.emit('bullethitotherplayer6', {id :body.playerId})
+    }
+    }
+    function bulletotherplayer7(body) {
+      if (bullet7.active == true) {
+      bullet7.setActive(false)
+      bullet7.setVisible(false)
+      socket.emit('bullethitotherplayer7', {id :body.playerId})
+    }
     }
     socket.on('isPlayer1', function () {
        isPlayer1 = true;
@@ -184,14 +255,16 @@ export default class multilevel extends Phaser.Scene {
     socket.on('alived', function (playerInfo) {
       self.otherPlayers.getChildren().forEach(function (otherPlayer) {
         if (playerInfo.playerId === otherPlayer.playerId) {
-          character.setVisible(playerInfo.playeralive);
+          otherPlayer.setVisible(playerInfo.playeralive);
+          otherGun.setVisible(playerInfo.playeralive);
         }
       });
     });
     socket.on('deaded', function (playerInfo) {
       self.otherPlayers.getChildren().forEach(function (otherPlayer) {
         if (playerInfo.playerId === otherPlayer.playerId) {
-          character.setVisible(playerInfo.playeralive);
+          otherPlayer.setVisible(playerInfo.playeralive);+
+          otherGun.setVisible(playerInfo.playeralive);
         }
       });
     });
@@ -200,6 +273,20 @@ export default class multilevel extends Phaser.Scene {
         if (playerInfo.playerId === otherPlayer.playerId) {
           otherbullet.setActive(playerInfo.bulletactive);
           otherbullet.setVisible(playerInfo.bulletactive);
+        }
+      });
+    });
+    socket.on('bullethittedyou', function (playerInfo) {
+      self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+        if (playerInfo.playerId === otherPlayer.playerId) {
+          otherbullet.setActive(playerInfo.bulletactive);
+          otherbullet.setVisible(playerInfo.bulletactive);
+          if (invincible) {
+          }
+          else {
+          invincible = true
+          Health -= 10;
+          }
         }
       });
     });
@@ -276,21 +363,15 @@ this.anims.create({
 //floors
           var floors = this.physics.add.staticGroup()
           floors.create(20, 1180, 'floor_small');
-      for (var i = 0; i < 2; i++) {
-          floors.create(20, 1140 - i * 40, 'floor_side');
-      }
+          floors.create(20, 1120, 'floor_vertical7');
           floors.create(20, 1060, 'floor_small').flipY = true;
       for (var i = 0; i < 2; i++) {
           floors.create(20, 1020 - i * 40, 'floor_middle');
       }
           floors.create(20, 940, 'floor_small');
-      for (var i = 0; i < 3; i++) {
-          floors.create(20, 900 - i * 40, 'floor_side');
-      }
+          floors.create(20, 860, 'floor_vertical8');
           floors.create(20, 780, 'floor_side_small');
-      for (var i = 0; i < 18; i++) {
-          floors.create(20, 740 - i * 40, 'floor_side');
-      }
+          floors.create(20, 400, 'floor_bigvertical');
           floors.create(20, 20, 'floor_small').flipY = true;
 
       for (var i = 0; i < 51; i++) {
@@ -331,8 +412,7 @@ this.anims.create({
           floors.create(340, 860, 'floor_middle');
           floors.create(340, 820, 'floor_front');
           floors.create(380, 900, 'floor_bottom_small');
-          floors.create(380, 860, 'floor_side');
-          floors.create(380, 820, 'floor_diag');
+          floors.create(380, 840, 'floor_vertical6');
           floors.create(420, 900, 'floor_tube_side');
           floors.create(460, 900, 'floor_sidemiddle');
 
@@ -448,16 +528,9 @@ this.anims.create({
           floors.create(660, 1100, 'floor_diag').flipX = true;
           floors.create(700, 1060, 'floor_diag').flipX = true;
           floors.create(700, 1140, 'floor_middle');
-          floors.create(740, 1020, 'floor_topmiddle');
-          floors.create(740, 1140, 'floor_side');
-          floors.create(740, 1060, 'floor_side_small_line');
-          floors.create(740, 1100, 'floor_side');
+          floors.create(740, 1080, 'floor_vertical1');
 
-          floors.create(820, 1060, 'floor_topmiddle').flipY = true;
-      for (var i = 0; i < 2; i++) {
-          floors.create(820, 1020 - i * 40, 'floor_tube_up');
-      }
-          floors.create(820, 940, 'floor_topmiddle');
+          floors.create(820, 1000, 'floor_vertical2');
 
           floors.create(740, 820, 'floor_sidemiddle').flipX = true;
           floors.create(780, 820, 'floor_tube_side');
@@ -469,10 +542,7 @@ this.anims.create({
           floors.create(940, 1140, 'floor_small').flipX = true;
           floors.create(940, 1100, 'floor_diag').flipX = true;
           floors.create(980, 1180, 'floor_small')
-      for (var i = 0; i < 2; i++) {
-          floors.create(980, 1140 - i * 40, 'floor_side');
-      }
-          floors.create(980, 1060, 'floor_topmiddle');
+          floors.create(980, 1100, 'floor_vertical3');
 
           floors.create(900, 940, 'floor_sidemiddle').flipX = true;
       for (var i = 0; i < 2; i++) {
@@ -486,10 +556,8 @@ this.anims.create({
       }
           floors.create(1180, 820, 'floor_sidemiddle');
 
-          floors.create(1060, 700, 'floor_topmiddle').flipY = true;
-      for (var i = 0; i < 4; i++) {
-          floors.create(1060, 660 - i * 40, 'floor_tube_up');
-      }
+          floors.create(1060, 620, 'floor_vertical5');
+
           floors.create(780, 500, 'floor_sidemiddle').flipX = true;
       for (var i = 0; i < 2; i++) {
           floors.create(820 + i * 40, 500, 'floor_tube_side');
@@ -510,8 +578,7 @@ this.anims.create({
       }
           floors.create(1340, 500, 'floor_sidemiddle');
 
-          floors.create(1060, 1140, 'floor_tube_up');
-          floors.create(1060, 1100, 'floor_topmiddle');
+          floors.create(1060, 1120, 'floor_vertical4');
 
           floors.create(900, 660, 'floor_sidemiddle').flipX = true;
           floors.create(940, 660, 'floor_tube_side')
@@ -532,9 +599,7 @@ this.anims.create({
           floors.create(1100, 1180, 'floor_front');
 
           floors.create(1140, 1180, 'floor_small').flipX = true;
-      for (var i = 0; i < 2; i++) {
-          floors.create(1140, 1140 - i * 40, 'floor_side').flipX = true;
-      }
+          floors.create(1140, 1100, 'floor_vertical3').flipX = true;
           floors.create(1140, 1060, 'floor_topmiddle')
           floors.create(1180, 1180, 'floor_middle');
           floors.create(1180, 1140, 'floor_small');
@@ -542,11 +607,8 @@ this.anims.create({
           floors.create(1220, 1180, 'floor_small');
           floors.create(1220, 1140, 'floor_diag');
 
+          floors.create(1380, 1080, 'floor_vertical1').flipX = true;
           floors.create(1380, 1180, 'floor_small').flipX = true;
-          floors.create(1380, 1140, 'floor_side').flipX = true;
-          floors.create(1380, 1100, 'floor_side').flipX = true;
-          floors.create(1380, 1060, 'floor_side_small_line').flipX = true;
-          floors.create(1380, 1020, 'floor_topmiddle');
           floors.create(1420, 1180, 'floor_middle');
           floors.create(1420, 1140, 'floor_middle');
           floors.create(1420, 1100, 'floor_small');
@@ -571,12 +633,9 @@ this.anims.create({
           floors.create(900, 260, 'floor_topmiddle');
           floors.create(940, 340, 'floor_bottom_small');
           floors.create(940, 300, 'floor_diag');
-          floors.create(980, 380, 'floor_topmiddle').flipY = true;
-          floors.create(980, 340, 'floor_diag_withsmall');
+          floors.create(980, 360, 'floor_vertical9');
 
-          floors.create(1060, 380, 'floor_topmiddle').flipY = true;
-          floors.create(1060, 340, 'floor_tube_up');
-          floors.create(1060, 300, 'floor_tube_up');
+          floors.create(1060, 340, 'floor_vertical10');
           floors.create(980, 220, 'floor_sidemiddle').flipX = true;
           var floorflip4 = floors.create(1020, 260, 'floor_diag');
           floorflip4.flipX = true;
@@ -592,8 +651,7 @@ this.anims.create({
           floors.create(1100, 180, 'floor_diag');
           floors.create(1140, 220, 'floor_sidemiddle');
 
-          floors.create(1140, 380, 'floor_topmiddle').flipY = true;
-          floors.create(1140, 340, 'floor_diag_withsmall').flipX = true;
+          floors.create(1140, 360, 'floor_vertical9').flipX = true;
           floors.create(1180, 340, 'floor_bottom_small').flipX = true;
           floors.create(1180, 300, 'floor_diag').flipX = true;
           floors.create(1220, 340, 'floor_bottom_small');
@@ -706,9 +764,8 @@ this.anims.create({
 
           floors.create(1660, 900, 'floor_sidemiddle').flipX = true;
           floors.create(1700, 900, 'floor_tube_side');
+          floors.create(1740, 840, 'floor_vertical6').flipX = true;
           floors.create(1740, 900, 'floor_bottom_small').flipX = true;
-          floors.create(1740, 860, 'floor_side').flipX = true;
-          floors.create(1740, 820, 'floor_diag').flipX = true;
           floors.create(1780, 900, 'floor_front').flipY = true;
           floors.create(1780, 860, 'floor_middle');
           floors.create(1780, 820, 'floor_front');
@@ -741,10 +798,7 @@ this.anims.create({
           floors.create(1940 + i * 40, 780, 'floor_tube_side');
       }
 
-          floors.create(1300, 940, 'floor_topmiddle');
-          floors.create(1300, 980, 'floor_tube_up');
-          floors.create(1300, 1020, 'floor_tube_up');
-          floors.create(1300, 1060, 'floor_topmiddle').flipY = true;
+          floors.create(1300, 1000, 'floor_vertical2');
 
           floors.create(1780, 1020, 'floor_sidemiddle').flipX = true;
           floors.create(1820, 1020, 'floor_tube_side');
@@ -761,13 +815,9 @@ this.anims.create({
           floors.create(2060, 980, 'floor_small').flipX = true;
           floors.create(2060, 940, 'floor_diag').flipX = true;
 
-      for (var i = 0; i < 18; i++) {
-          floors.create(2100, 60 + i * 40, 'floor_side').flipX = true;
-      }
+          floors.create(2100, 400, 'floor_bigvertical').flipX = true;
           floors.create(2100, 780, 'floor_side_small').flipX = true;
-      for (var i = 0; i < 3; i++) {
-          floors.create(2100, 820 + i * 40, 'floor_side').flipX = true;
-      }
+          floors.create(2100, 860, 'floor_vertical8').flipX = true;
           floors.create(2100, 940, 'floor_small').flipX = true;
       for (var i = 0; i < 2; i++) {
           floors.create(2100, 980 + i * 40, 'floor_middle');
@@ -775,8 +825,7 @@ this.anims.create({
           var floorflip14 = floors.create(2100, 1060, 'floor_small');
           floorflip14.flipX = true;
           floorflip14.flipY = true;
-          floors.create(2100, 1100, 'floor_side').flipX = true;
-          floors.create(2100, 1140, 'floor_side').flipX = true;
+          floors.create(2100, 1120, 'floor_vertical7').flipX = true;
           floors.create(2100, 1180, 'floor_small').flipX = true;
       for (var i = 0; i < 2; i++) {
           floors.create(660 + i * 40, 1180, 'floor_middle');
@@ -832,7 +881,7 @@ this.anims.create({
       this.physics.add.overlap(floors, bullet5, bullethitfloor5)
       this.physics.add.overlap(floors, bullet6, bullethitfloor6)
       function bullethitfloor1() {
-        socket.emit('bullethit')
+        socket.emit('bullethit');
         bullet1.setActive(false);
         bullet1.setVisible(false);
       }
@@ -858,11 +907,15 @@ this.anims.create({
       }
 //key on
     key_R.on('down', function () {
-      Health = 100
-      console.log('wa');
-      character.setActive(true);
-      character.setVisible(true);
-      socket.emit('alive')
+      if (Health == 0) {
+        Health = 100
+        console.log('wa');
+        character.setActive(true);
+        character.setVisible(true);
+        gun.setVisible(true);
+        socket.emit('alive')
+        CanMove = true;
+      }
     })
     key_1.on('down', function () {
       CanMove = true;
@@ -915,36 +968,53 @@ this.anims.create({
           }
        }
     })
+          healthtext = this.add.text( 1000, 500,"Health = " + Health).setScrollFactor(0).setDepth(3);
 	}
   update(){
+    if (invincible == true) {
+      invincibletimer -= 1
+    }
+    if (invincibletimer <= 0) {
+      invincibletimer = 60
+      invincible = false
+    }
     if (this.input.activePointer.isDown) {
-      if (bulletcooldown <= 0) {
-        thebullet = bullets.getFirstDead(false);+
-        thebullet.setDepth(1);
-        thebullet.x = gun.x;
-        thebullet.y = gun.y;
-        thebullet.setActive(true);
-        thebullet.setVisible(true);
-        bulletcooldown = 30
-        thebullet.rotation = gun.rotation;
-        this.physics.velocityFromRotation(thebullet.rotation, 600, thebullet.body.velocity);
-        socket.emit('bulletshot')
+      if (character.active == true) {
+        if (bulletcooldown <= 0) {
+          thebullet = bullets.getFirstDead(false);+
+          thebullet.setDepth(1);
+          thebullet.x = gun.x;
+          thebullet.y = gun.y;
+          thebullet.setActive(true);
+          thebullet.setVisible(true);
+          bulletcooldown = 30
+          thebullet.rotation = gun.rotation;
+          this.physics.velocityFromRotation(thebullet.rotation, 600, thebullet.body.velocity);
+          socket.emit('bulletshot')
+        }
       }
     }
     bulletcooldown -= 1
 //character
     if (spawned) {
       if (Health <= 0) {
+        CanMove = false;
         healthtext.text = ("Press R to respawn")
         character.setActive(false);
         character.setVisible(false);
+        gun.setVisible(false);
+        socket.emit('dead')
       }
       else {
         healthtext.text = ("Health = " + Health)
       }
+      if (this.input.activePointer.distance == 0) {
+      }
+      else {
         gun.rotation = Phaser.Math.Angle.Between(gun.x, gun.y, this.input.activePointer.worldX , this.input.activePointer.worldY);
+      }
         gun.x = character.x;
-        gun.y = character.y + 13;
+        gun.y = character.y + 10;
         if (this.input.activePointer.worldX > character.x) {
           character.flipX = false;
         }
@@ -962,10 +1032,11 @@ this.anims.create({
             character.setVelocityX(0);
           }
           if (key_Space.isDown && character.body.touching.down) {
-            character.setVelocityY(-350);
+            character.setVelocityY(-375);
+            console.log(character.x);
           }
           else if(key_W.isDown && character.body.touching.down){
-            character.setVelocityY(-350);
+            character.setVelocityY(-375);
           }
         }
     }
