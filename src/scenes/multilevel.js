@@ -6,6 +6,7 @@ var key_A;
 var key_S;
 var key_D;
 var key_Space;
+var key_ESC;
 var invincible = false;
 var invincibletimer = 60;
 var testspeed = 0;
@@ -43,39 +44,6 @@ export default class multilevel extends Phaser.Scene {
     super({key: "multilevel"});
   }
 	preload(){
-    this.load.setPath('assets/');
-    this.load.spritesheet('character1', 'character1.png', {frameWidth: 35, frameHeight: 35})
-    this.load.spritesheet('walljump1', 'walljump1.png', {frameWidth: 35, frameHeight: 35})
-    this.load.image('gun1', 'gun1.png')
-    this.load.image('bullet1', 'bullet1.png')
-    this.load.image('floor', 'floor.png')
-    this.load.image('floor_side', 'floor_side.png')
-    this.load.image('floor_small', 'floor_small.png')
-    this.load.image('floor_front', 'floor_front.png')
-    this.load.image('floor_bottom_small', 'floor_bottom_small.png')
-    this.load.image('floor_middle', 'floor_middle.png')
-    this.load.image('floor_middle_small', 'floor_middle_small.png')
-    this.load.image('floor_bottom_middle_small', 'floor_bottom_middle_small.png')
-    this.load.image('floor_side_small', 'floor_side_small.png')
-    this.load.image('floor_sidemiddle', 'floor_sidemiddle.png')
-    this.load.image('floor_topmiddle', 'floor_topmiddle.png')
-    this.load.image('floor_tube_up', 'floor_tube_up.png')
-    this.load.image('floor_tube_side', 'floor_tube_side.png')
-    this.load.image('floor_diag', 'floor_diag.png')
-    this.load.image('floor_diag_small', 'floor_diag_small.png')
-    this.load.image('floor_triple_small', 'floor_triple_small.png')
-    this.load.image('floor_side_small_line', 'floor_side_small_line.png')
-    this.load.image('floor_vertical1', 'floor_vertical1.png')
-    this.load.image('floor_vertical2', 'floor_vertical2.png')
-    this.load.image('floor_vertical3', 'floor_vertical3.png')
-    this.load.image('floor_vertical4', 'floor_vertical4.png')
-    this.load.image('floor_vertical5', 'floor_vertical5.png')
-    this.load.image('floor_vertical6', 'floor_vertical6.png')
-    this.load.image('floor_vertical7', 'floor_vertical7.png')
-    this.load.image('floor_vertical8', 'floor_vertical8.png')
-    this.load.image('floor_vertical9', 'floor_vertical9.png')
-    this.load.image('floor_vertical10', 'floor_vertical10.png')
-    this.load.image('floor_bigvertical', 'floor_bigvertical.png')
 }
 	create(){
 //multiplayer
@@ -84,7 +52,11 @@ export default class multilevel extends Phaser.Scene {
     var isPlayer2 = false;
     var isPlayer3 = false;
     var isPlayer4 = false;
-    socket = io('http://192.168.193.222:8081/');
+    socket = io('http://192.168.193.222:8081/', {
+  reconnection: false,
+  reconnectionDelayMax: 10000,
+
+});
     otherbullets = this.physics.add.group();
     this.otherPlayers = this.physics.add.group();
     function addPlayer(self, playerInfo) {
@@ -188,6 +160,11 @@ export default class multilevel extends Phaser.Scene {
       bullet7.setVisible(false)
       socket.emit('bullethitotherplayer7', {id :body.playerId})
     }
+    }
+    socket.on('connect_error', error );
+    function error(){
+    console.log('Connection Failed');
+    self.scene.start('menu')
     }
     socket.on('isPlayer1', function () {
        isPlayer1 = true;
@@ -346,6 +323,7 @@ export default class multilevel extends Phaser.Scene {
     key_R = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
     key_E = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     key_Shift = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+    key_ESC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     var floors = this.physics.add.staticGroup();
 //characteranimations
     this.anims.create({
@@ -906,6 +884,9 @@ this.anims.create({
         bullet6.setVisible(false);
       }
 //key on
+    key_ESC.on('up', function () {
+      this.scene.start('menu')
+    },this)
     key_R.on('down', function () {
       if (Health == 0) {
         Health = 100

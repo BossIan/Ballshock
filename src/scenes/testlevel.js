@@ -24,7 +24,7 @@ var bulletcooldown = 0;
 var bullets;
 var Health = 100;
 var healthtext;
-
+var key_ESC;
 
 
 
@@ -42,29 +42,6 @@ export default class testlevel extends Phaser.Scene {
     super({key: "testlevel"});
   }
 	preload(){
-    this.load.setPath('assets/');
-    this.load.spritesheet('character1', 'character1.png', {frameWidth: 35, frameHeight: 35})
-    this.load.spritesheet('walljump1', 'walljump1.png', {frameWidth: 35, frameHeight: 35})
-    this.load.image('gun1', 'gun1.png')
-    this.load.image('bullet1', 'bullet1.png')
-    this.load.image('floor', 'floor.png')
-    this.load.image('floor_side', 'floor_side.png')
-    this.load.image('floor_small', 'floor_small.png')
-    this.load.image('floor_front', 'floor_front.png')
-    this.load.image('floor_bottom_small', 'floor_bottom_small.png')
-    this.load.image('floor_middle', 'floor_middle.png')
-    this.load.image('floor_middle_small', 'floor_middle_small.png')
-    this.load.image('floor_bottom_middle_small', 'floor_bottom_middle_small.png')
-    this.load.image('floor_side_small', 'floor_side_small.png')
-    this.load.image('floor_sidemiddle', 'floor_sidemiddle.png')
-    this.load.image('floor_topmiddle', 'floor_topmiddle.png')
-    this.load.image('floor_tube_up', 'floor_tube_up.png')
-    this.load.image('floor_tube_side', 'floor_tube_side.png')
-    this.load.image('floor_diag', 'floor_diag.png')
-    this.load.image('floor_diag_small', 'floor_diag_small.png')
-    this.load.image('floor_triple_small', 'floor_triple_small.png')
-    this.load.image('floor_side_small_line', 'floor_side_small_line.png')
-    this.load.image('floor_diag_withsmall', 'floor_diag_withsmall.png')
 }
 	create(){
 //keys
@@ -78,6 +55,7 @@ export default class testlevel extends Phaser.Scene {
     key_Q = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
     key_E = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     key_Shift = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+    key_ESC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 //character
     character = this.physics.add.sprite(80, 1100, 'character1', 0)
     var camera = this.cameras.main;
@@ -661,8 +639,8 @@ for (var i = 0; i < 6; i++) {
       bullet7.setVisible(false);
     }
 //key on
-    key_Q.on('up', function () {
-      this.scene.start('multilevel')
+    key_ESC.on('up', function () {
+      this.scene.start('menu')
     },this)
     key_1.on('down', function () {
       CanMove = true;

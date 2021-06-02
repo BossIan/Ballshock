@@ -1,6 +1,9 @@
 import Phaser from 'phaser';
 import testlevel from './scenes/testlevel';
 import multilevel from './scenes/multilevel';
+import prelogo from './scenes/prelogo';
+import logo from './scenes/logo';
+import menu from './scenes/menu';
 var width = 2120;
 var height = 1200;
 var config;
@@ -17,7 +20,7 @@ config = {
     transparent: false,
     expandParent: true,
     gameTitle: "Ballshock",
-    gameVersion: "0.0.0.6",
+    gameVersion: "0.0.1.3",
     pixelArt: true,
     physics: {
         default: 'arcade',
@@ -26,6 +29,6 @@ config = {
             gravity: {y: 800}
         }
     },
-    scene:[testlevel, multilevel]
+    scene:[prelogo, logo, menu, testlevel, multilevel]
 };
 var game = new Phaser.Game(config);
