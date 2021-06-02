@@ -28,6 +28,17 @@ export default class logo extends Phaser.Scene {
   this.load.image('floor_triple_small', 'floor_triple_small.png')
   this.load.image('floor_side_small_line', 'floor_side_small_line.png')
   this.load.image('floor_diag_withsmall', 'floor_diag_withsmall.png')
+  this.load.image('floor_vertical1', 'floor_vertical1.png')
+  this.load.image('floor_vertical2', 'floor_vertical2.png')
+  this.load.image('floor_vertical3', 'floor_vertical3.png')
+  this.load.image('floor_vertical4', 'floor_vertical4.png')
+  this.load.image('floor_vertical5', 'floor_vertical5.png')
+  this.load.image('floor_vertical6', 'floor_vertical6.png')
+  this.load.image('floor_vertical7', 'floor_vertical7.png')
+  this.load.image('floor_vertical8', 'floor_vertical8.png')
+  this.load.image('floor_vertical9', 'floor_vertical9.png')
+  this.load.image('floor_vertical10', 'floor_vertical10.png')
+  this.load.image('floor_bigvertical', 'floor_bigvertical.png')
   this.load.spritesheet('multiplayer', 'multiplayer.png', {frameWidth: 128, frameHeight: 64});
   this.load.spritesheet('play', 'play.png', {frameWidth: 128, frameHeight: 64});
   this.load.spritesheet('quit', 'quit.png', {frameWidth: 128, frameHeight: 64});
