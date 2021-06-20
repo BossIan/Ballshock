@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var socket = require('socket.io');
 var server = require("http").createServer();
-server.listen(8081, '192.168.193.222')
+server.listen(8081, '192.168.0.21')
 const io = require("socket.io")(server)
 var players = {}
 var noofplayers = 0;
@@ -13,18 +13,6 @@ app.get('/', function (req, res) {
 io.on('connection', function (socket) {
   noofplayers += 1;
   console.log(noofplayers +' user connected.');
-    if (noofplayers == 1) {
-      io.emit('isPlayer1');
-    }
-    if (noofplayers == 2) {
-      io.emit('isPlayer2')
-    }
-    if (noofplayers == 3) {
-      io.emit('isPlayer3')
-    }
-    if (noofplayers == 4) {
-      io.emit('isPlayer4')
-    }
     players[socket.id] = {
       rotation: 0,
       x: 0,
