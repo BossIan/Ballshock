@@ -962,7 +962,7 @@ this.anims.create({
       if (character.active == true) {
         if (bulletcooldown <= 0) {
           thebullet = bullets.getFirstDead(false);+
-          thebullet.setDepth(1);
+          thebullet.setDepth(12);
           thebullet.x = gun.x;
           thebullet.y = gun.y;
           thebullet.setActive(true);
