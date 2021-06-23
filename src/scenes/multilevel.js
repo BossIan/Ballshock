@@ -20,7 +20,9 @@ var speed = 200;
 var character;
 var gun;
 var otherPlayer;
+var otherName;
 var otherGun;
+var otherHp;
 var spawned = false;
 var player;
 var otherbullet;
@@ -38,6 +40,7 @@ var bullets;
 var Health = 100;
 var healthtext;
 var myid;
+var name;
 export default class multilevel extends Phaser.Scene {
   constructor(){
     super({key: "multilevel"});
@@ -45,6 +48,7 @@ export default class multilevel extends Phaser.Scene {
 	preload(){
 }
 	create(){
+    var savefile = JSON.parse(localStorage.getItem('saveFile'));
 //multiplayer
     var self = this;
     var isPlayer1 = false;
@@ -54,13 +58,18 @@ export default class multilevel extends Phaser.Scene {
     socket = io('http://192.168.0.21:8081/', {
   reconnection: false,
   reconnectionDelayMax: 10000,
-
 });
+
     this.otherPlayers = this.physics.add.group();
     this.otherGuns = this.physics.add.group();
     this.otherbullets = this.physics.add.group();
+    this.otherNames = this.add.group();
+    this.otherHps = this.add.group();
     function addPlayer(self, playerInfo) {
       character = self.physics.add.sprite(80, 1100, 'character1', 0).setDepth(10);
+      name = self.add.text(character.x, character.y - 35, savefile.name, { font: '15px Corbel', fill: '#000000' });
+      name.setOrigin( 0.5, 0);
+      console.log(name.text);
       myid = playerInfo.playerId;
       var camera = self.cameras.main;
       camera.setZoom(2.5)
@@ -110,6 +119,12 @@ export default class multilevel extends Phaser.Scene {
       otherbullet.body.allowGravity = false;
       otherGun.body.allowGravity = false;
       otherPlayer.body.allowGravity = false;
+      otherName = self.add.text(playerInfo.x, playerInfo.y - 35, playerInfo.playername, { font: '15px Corbel', fill: '#000000' });
+      otherName.setOrigin( 0.5, 0);
+      self.otherNames.add(otherName);
+      otherHp = self.add.text(playerInfo.x, playerInfo.y + 25, playerInfo.health, { font: '15px Corbel', fill: '#000000' });
+      otherHp.setOrigin( 0.5, 0);
+      self.otherHps.add(otherHp);
       if (playerInfo.playernumber == 1) {
         otherPlayer.setDepth(8);
         otherGun.setDepth(9);
@@ -184,6 +199,9 @@ export default class multilevel extends Phaser.Scene {
     console.log('Connection Failed');
     self.scene.start('menu')
     }
+    socket.on('connect',function(){
+      socket.emit('data', savefile.name)
+    });
 //otherPlayers
     socket.on('currentPlayers', function (players) {
         Object.keys(players).forEach(function (id) {
@@ -197,6 +215,15 @@ export default class multilevel extends Phaser.Scene {
     socket.on('newPlayer', function (playerInfo) {
         addOtherPlayers(self, playerInfo);
       });
+    socket.on('nameforyou', function (playerInfo) {
+      self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+        if (playerInfo.playerId === otherPlayer.playerId) {
+          otherName = self.add.text(playerInfo.x, playerInfo.y - 35, playerInfo.playername, { font: '15px Corbel', fill: '#000000' });
+          otherName.setOrigin( 0.5, 0);
+          self.otherNames.add(otherName);
+        }
+      });
+    })
     socket.on('disconnected', function (playerInfo) {
         self.otherPlayers.getChildren().forEach(function (otherPlayer) {
           if (playerInfo.playerId === otherPlayer.playerId) {
@@ -207,6 +234,16 @@ export default class multilevel extends Phaser.Scene {
           if (playerInfo.playerId === otherPlayer.playerId) {
             otherGun.destroy();
           }
+        });
+          self.otherNames.getChildren().forEach(function () {
+            if (playerInfo.playerId === otherPlayer.playerId) {
+              otherName.destroy();
+            }
+        });
+          self.otherHps.getChildren().forEach(function () {
+            if (playerInfo.playerId === otherPlayer.playerId) {
+              otherHp.destroy();
+            }
         });
       });
     socket.on('spawnplayers',function (players) {
@@ -228,6 +265,16 @@ export default class multilevel extends Phaser.Scene {
             otherGun.setVisible(playerInfo.playeralive);
           }
       });
+        self.otherNames.getChildren().forEach(function () {
+          if (playerInfo.playerId === otherPlayer.playerId) {
+          otherName.setVisible(playerInfo.playeralive);
+          }
+      });
+      self.otherHps.getChildren().forEach(function () {
+          if (playerInfo.playerId === otherPlayer.playerId) {
+          otherHp.setVisible(playerInfo.playeralive);
+          }
+      });
     });
     socket.on('deaded', function (playerInfo) {
       self.otherPlayers.getChildren().forEach(function (otherPlayer) {
@@ -238,6 +285,16 @@ export default class multilevel extends Phaser.Scene {
         self.otherGuns.getChildren().forEach(function () {
           if (playerInfo.playerId === otherPlayer.playerId) {
             otherGun.setVisible(playerInfo.playeralive);
+          }
+      });
+        self.otherNames.getChildren().forEach(function () {
+          if (playerInfo.playerId === otherPlayer.playerId) {
+            otherName.setVisible(playerInfo.playeralive);
+          }
+      });
+        self.otherHps.getChildren().forEach(function () {
+          if (playerInfo.playerId === otherPlayer.playerId) {
+            otherHp.setVisible(playerInfo.playeralive);
           }
       });
     });
@@ -254,12 +311,7 @@ export default class multilevel extends Phaser.Scene {
         if (playerInfo.playerId === otherPlayer.playerId) {
           otherbullet.setActive(playerInfo.bulletactive);
           otherbullet.setVisible(playerInfo.bulletactive);
-          if (invincible) {
-          }
-          else {
-          invincible = true
           Health -= 10;
-          }
         }
       });
     });
@@ -273,6 +325,16 @@ export default class multilevel extends Phaser.Scene {
         if (playerInfo.playerId === otherPlayer.playerId) {
           otherGun.setPosition(playerInfo.x, playerInfo.y + 13)
         }
+      });
+        self.otherNames.getChildren().forEach(function () {
+          if (playerInfo.playerId === otherPlayer.playerId) {
+            otherName.setPosition(playerInfo.x, playerInfo.y - 35)
+          }
+      });
+        self.otherHps.getChildren().forEach(function () {
+          if (playerInfo.playerId === otherPlayer.playerId) {
+            otherHp.setPosition(playerInfo.x, playerInfo.y + 25)
+          }
       });
     });
     socket.on('bulletMovemented', function (playerInfo) {
@@ -308,6 +370,14 @@ export default class multilevel extends Phaser.Scene {
       self.otherPlayers.getChildren().forEach(function (otherPlayer) {
         if (playerInfo.playerId === otherPlayer.playerId) {
           otherPlayer.flipX = playerInfo.flipped;
+        }
+      });
+    });
+    socket.on('healthupdated', function (playerInfo) {
+      self.otherHps.getChildren().forEach(function () {
+        if (playerInfo.playerId === otherPlayer.playerId) {
+          otherHp.text = playerInfo.health;
+          console.log(playerInfo.health);
         }
       });
     });
@@ -885,6 +955,9 @@ this.anims.create({
       }
 //key on
     key_ESC.on('up', function () {
+      character.destroy();
+      spawned = false;
+      socket.disconnect();
       this.scene.start('menu')
     },this)
     key_R.on('down', function () {
@@ -893,6 +966,7 @@ this.anims.create({
         character.setActive(true);
         character.setVisible(true);
         gun.setVisible(true);
+        name.setVisible(true);
         socket.emit('alive')
         CanMove = true;
       }
@@ -951,13 +1025,6 @@ this.anims.create({
           healthtext = this.add.text( 1000, 500,"Health = " + Health).setScrollFactor(0).setDepth(3);
 	}
   update(){
-    if (invincible == true) {
-      invincibletimer -= 1
-    }
-    if (invincibletimer <= 0) {
-      invincibletimer = 60
-      invincible = false
-    }
     if (this.input.activePointer.isDown) {
       if (character.active == true) {
         if (bulletcooldown <= 0) {
@@ -977,12 +1044,15 @@ this.anims.create({
     bulletcooldown -= 1
 //character
     if (spawned) {
+      name.x = character.x;
+      name.y = character.y - 35;
       if (Health <= 0) {
         CanMove = false;
         healthtext.text = ("Press R to respawn")
         character.setActive(false);
         character.setVisible(false);
         gun.setVisible(false);
+        name.setVisible(false);
         socket.emit('dead')
       }
       else {
@@ -1018,56 +1088,66 @@ this.anims.create({
             character.setVelocityY(-375);
           }
         }
+        if (character) {
+          // emit player movement
+          var x = character.x;
+          var y = character.y;
+          if (character.oldPosition && (x !== character.oldPosition.x || y !== character.oldPosition.y)) {
+            socket.emit('playerMovement', { x: character.x, y: character.y})
+          }
+          character.oldPosition = {
+            x: character.x,
+            y: character.y,
+          }
+          //emit player animations
+          var curanim = character.anims.currentAnim.key;
+          if (character.oldanim && curanim !== character.oldanim.curanim) {
+            socket.emit('playeranim', { curanim: character.anims.currentAnim.key})
+          }
+          character.oldanim = {
+            curanim: character.anims.currentAnim.key,
+          }
+          //emit flip
+          var flipped = character.flipX;
+          if (character.oldflip && flipped !== character.oldflip.flipped) {
+            socket.emit('playerflip', { flipped: character.flipX})
+          }
+          character.oldflip = {
+            flipped: character.flipX,
+          }
+        }
+        //emit gun
+        if (gun) {
+          var gunrotation = gun.rotation;
+          if (gun.oldrotation && (gunrotation !== gun.oldrotation.gunrotation)) {
+            socket.emit('gunRotatement', { gunrotation: gun.rotation})
+          }
+           gun.oldrotation = {
+            gunrotation: gun.rotation,
+           }
+        }
+        if (thebullet) {
+          var bulletx = thebullet.x
+          var bullety = thebullet.y
+          if (thebullet.oldPosition && (bulletx !== thebullet.oldPosition.bulletx)) {
+            socket.emit('bulletMovement', { bulletx: thebullet.x, bullety: thebullet.y})
+          }
+          thebullet.oldPosition = {
+            bulletx: thebullet.x,
+            bullety: thebullet.y,
+          }
+        }
+        if (Health) {
+          var hp = Health;
+          if (character.oldData && hp !== character.oldData.hp) {
+            socket.emit('healthupdate', { hp: Health})
+          }
+          character.oldData = {
+            hp: Health,
+          }
+        }
+       }
     }
 //multiplayer
-   if (character) {
-     // emit player movement
-     var x = character.x;
-     var y = character.y;
-     if (character.oldPosition && (x !== character.oldPosition.x || y !== character.oldPosition.y)) {
-       socket.emit('playerMovement', { x: character.x, y: character.y})
-     }
-     character.oldPosition = {
-       x: character.x,
-       y: character.y,
-     }
-     //emit player animations
-     var curanim = character.anims.currentAnim.key;
-     if (character.oldanim && curanim !== character.oldanim.curanim) {
-       socket.emit('playeranim', { curanim: character.anims.currentAnim.key})
-     }
-     character.oldanim = {
-       curanim: character.anims.currentAnim.key,
-     }
-     //emit flip
-     var flipped = character.flipX;
-     if (character.oldflip && flipped !== character.oldflip.flipped) {
-       socket.emit('playerflip', { flipped: character.flipX})
-     }
-     character.oldflip = {
-       flipped: character.flipX,
-     }
-   }
-   //emit gun
-   if (gun) {
-     var gunrotation = gun.rotation;
-     if (gun.oldrotation && (gunrotation !== gun.oldrotation.gunrotation)) {
-       socket.emit('gunRotatement', { gunrotation: gun.rotation})
-     }
-      gun.oldrotation = {
-       gunrotation: gun.rotation,
-      }
-   }
-   if (thebullet) {
-     var bulletx = thebullet.x
-     var bullety = thebullet.y
-     if (thebullet.oldPosition && (bulletx !== thebullet.oldPosition.bulletx)) {
-       socket.emit('bulletMovement', { bulletx: thebullet.x, bullety: thebullet.y})
-     }
-     thebullet.oldPosition = {
-       bulletx: thebullet.x,
-       bullety: thebullet.y,
-     }
-   }
-  }
+
 }

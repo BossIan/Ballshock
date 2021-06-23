@@ -27,7 +27,14 @@ io.on('connection', function (socket) {
       gunrotation: 0,
       bulletactive: false,
       playeralive: true,
+      playername: '',
     };
+socket.on('data', function (data) {
+  console.log(data + ' has connected.');
+  players[socket.id].playername = data;
+  socket.broadcast.emit('nameforyou', players[socket.id]);
+})
+
 socket.emit('currentPlayers', players);
 socket.broadcast.emit('newPlayer', players[socket.id]);
 socket.on('bullethit', function () {
@@ -73,6 +80,10 @@ socket.on('playerflip', function (flipData) {
   players[socket.id].flipped = flipData.flipped;
   socket.broadcast.emit('playerfliped', players[socket.id]);
 });
+socket.on('healthupdate', function (Healthdata) {
+  players[socket.id].health = Healthdata.hp;
+  socket.broadcast.emit('healthupdated', players[socket.id]);
+})
 socket.on('disconnect', function () {
   noofplayers -= 1;
   console.log('user disconnected');
