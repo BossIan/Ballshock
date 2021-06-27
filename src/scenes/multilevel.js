@@ -53,7 +53,8 @@ export default class multilevel extends Phaser.Scene {
     var savefile = JSON.parse(localStorage.getItem('saveFile'));
 //multiplayer
     var self = this;
-    socket = io(address + ':8081', {
+    console.log('Connecting to ' + address);
+    socket = io(address, {
   reconnection: false,
   reconnectionDelayMax: 10000,
 });
@@ -210,11 +211,22 @@ export default class multilevel extends Phaser.Scene {
     }
     socket.on('connect_error', error );
     function error(){
+      console.log('Connection Error');
     self.scene.start('menu')
     }
     socket.on('connect',function(){
+      console.log('Connected to ' + address);
       socket.emit('data', savefile.name)
     });
+    var ping = self.add.text( 1390, 375, 'ping: ', { font: '20px Corbel', fill: '#000000' }).setScrollFactor(0).setDepth(30);
+    setInterval(() => {
+  const start = Date.now();
+  socket.volatile.emit("ping", () => {
+    const latency = Date.now() - start;
+    console.log(latency);
+    ping.text = 'ping: ' + latency;
+  });
+}, 5000);
 //otherPlayers
     socket.on('currentPlayers', function (players) {
         Object.keys(players).forEach(function (id) {
@@ -973,13 +985,15 @@ this.anims.create({
       }
 //key on
     key_ESC.on('up', function () {
-      character.destroy();
+      if (spawned) {
+        character.destroy();
+      }
       spawned = false;
       socket.disconnect();
       this.scene.start('menu')
     },this)
     key_R.on('down', function () {
-      if (Health == 0) {
+      if (Health <= 0) {
         Health = 100
         var randomLocation = Phaser.Math.Between(0, 100);
         if (randomLocation <= 25) {
@@ -1055,25 +1069,25 @@ this.anims.create({
     })
 	}
   update(){
-    if (this.input.activePointer.isDown) {
-      if (character.active == true) {
-        if (bulletcooldown <= 0) {
-          thebullet = bullets.getFirstDead(false);+
-          thebullet.setDepth(12);
-          thebullet.x = gun.x;
-          thebullet.y = gun.y;
-          thebullet.setActive(true);
-          thebullet.setVisible(true);
-          bulletcooldown = 30
-          thebullet.rotation = gun.rotation;
-          this.physics.velocityFromRotation(thebullet.rotation, 600, thebullet.body.velocity);
-          socket.emit('bulletshot')
-        }
-      }
-    }
-    bulletcooldown -= 1
 //character
     if (spawned) {
+      bulletcooldown -= 1
+      if (this.input.activePointer.isDown) {
+        if (character.active == true) {
+          if (bulletcooldown <= 0) {
+            thebullet = bullets.getFirstDead(false);+
+            thebullet.setDepth(12);
+            thebullet.x = gun.x;
+            thebullet.y = gun.y;
+            thebullet.setActive(true);
+            thebullet.setVisible(true);
+            bulletcooldown = 30
+            thebullet.rotation = gun.rotation;
+            this.physics.velocityFromRotation(thebullet.rotation, 600, thebullet.body.velocity);
+            socket.emit('bulletshot')
+          }
+        }
+      }
       healthtext.setPosition(character.x, character.y + 25);
       name.setPosition(character.x, character.y - 35);
       if (Health <= 0) {
