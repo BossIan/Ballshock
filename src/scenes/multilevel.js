@@ -1,3 +1,4 @@
+import {address} from './enterip';
 import io from 'socket.io-client';
 var key_1;
 var key_2;
@@ -41,6 +42,7 @@ var Health = 100;
 var healthtext;
 var myid;
 var name;
+var map;
 export default class multilevel extends Phaser.Scene {
   constructor(){
     super({key: "multilevel"});
@@ -51,11 +53,7 @@ export default class multilevel extends Phaser.Scene {
     var savefile = JSON.parse(localStorage.getItem('saveFile'));
 //multiplayer
     var self = this;
-    var isPlayer1 = false;
-    var isPlayer2 = false;
-    var isPlayer3 = false;
-    var isPlayer4 = false;
-    socket = io('http://192.168.0.21:8081/', {
+    socket = io(address + ':8081', {
   reconnection: false,
   reconnectionDelayMax: 10000,
 });
@@ -66,40 +64,22 @@ export default class multilevel extends Phaser.Scene {
     this.otherNames = this.add.group();
     this.otherHps = this.add.group();
     function addPlayer(self, playerInfo) {
-      character = self.physics.add.sprite(80, 1100, 'character1', 0).setDepth(10);
-      name = self.add.text(character.x, character.y - 35, savefile.name, { font: '15px Corbel', fill: '#000000' });
+      character = self.physics.add.sprite(80, 1100, 'character1', 0).setDepth(20);
+      name = self.add.text(character.x, character.y - 35, savefile.name, { font: '15px Corbel', fill: '#000000' }).setDepth(30);
       name.setOrigin( 0.5, 0);
-      console.log(name.text);
       myid = playerInfo.playerId;
       var camera = self.cameras.main;
       camera.setZoom(2.5)
       camera.setBounds(0, 0, 2120, 1200)
       camera.startFollow(character);
       character.anims.play('dash')
-      gun = self.add.image(character.x, character.y, 'gun1').setDepth(12);
+      gun = self.add.image(character.x, character.y, 'gun1').setDepth(21);
       character.body.collideWorldBounds = true;
+      healthtext = self.add.text( character.x, character.y, Health, { font: '15px Corbel', fill: '#000000' }).setDepth(30);
+      healthtext.setOrigin( 0.5, 0);
       spawned = true;
 //character collider
       self.physics.add.collider(character, floors);
-      if (playerInfo.playernumber == 1) {
-        isPlayer1 = true;
-        console.log('You are player 1.');
-      }
-      else if (playerInfo.playernumber == 2) {
-        isPlayer2 = true;
-        console.log('You are player 2.');
-        character.tint = 0xeb4034
-      }
-      else if (playerInfo.playernumber == 3) {
-        isPlayer3 = true;
-        console.log('You are player 3.');
-        character.tint = 0x2f944a
-      }
-      else if (playerInfo.playernumber == 4) {
-        isPlayer4 = true;
-        console.log('You are player 4.');
-        character.tint = 0x3e13d6
-      }
     }
     function addOtherPlayers(self, playerInfo) {
       otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'character1', 0);
@@ -111,7 +91,6 @@ export default class multilevel extends Phaser.Scene {
       self.physics.add.overlap(otherPlayer, bullet6, bulletotherplayer6);
       self.physics.add.overlap(otherPlayer, bullet7, bulletotherplayer7);
       otherbullet = self.otherbullets.create(playerInfo.x, playerInfo.y + 13, 'bullet1');
-      otherbullet.setDepth(12);
       otherPlayerno = playerInfo.playernumber;
       otherGun = self.otherGuns.create(playerInfo.x, playerInfo.y + 13, 'gun1')
       otherPlayer.playerId = playerInfo.playerId;
@@ -119,84 +98,118 @@ export default class multilevel extends Phaser.Scene {
       otherbullet.body.allowGravity = false;
       otherGun.body.allowGravity = false;
       otherPlayer.body.allowGravity = false;
-      otherName = self.add.text(playerInfo.x, playerInfo.y - 35, playerInfo.playername, { font: '15px Corbel', fill: '#000000' });
+      otherName = self.add.text(playerInfo.x, playerInfo.y - 35, playerInfo.playername, { font: '15px Corbel', fill: '#000000' }).setDepth(30);
       otherName.setOrigin( 0.5, 0);
       self.otherNames.add(otherName);
       otherHp = self.add.text(playerInfo.x, playerInfo.y + 25, playerInfo.health, { font: '15px Corbel', fill: '#000000' });
       otherHp.setOrigin( 0.5, 0);
       self.otherHps.add(otherHp);
       if (playerInfo.playernumber == 1) {
+        otherPlayer.setDepth(20);
+        otherGun.setDepth(21);
+      }
+      else if (playerInfo.playernumber == 2) {
+        otherPlayer.setDepth(18);
+        otherGun.setDepth(19);
+      }
+      else if (playerInfo.playernumber == 3) {
+        otherPlayer.setDepth(16);
+        otherGun.setDepth(17);
+      }
+      else if (playerInfo.playernumber == 4) {
+        otherPlayer.setDepth(14);
+        otherGun.setDepth(15);
+      }
+      else if (playerInfo.playernumber == 5) {
+        otherPlayer.setDepth(12);
+        otherGun.setDepth(13);
+      }
+      else if (playerInfo.playernumber == 6) {
+        otherPlayer.setDepth(10);
+        otherGun.setDepth(11);
+      }
+      else if (playerInfo.playernumber == 7) {
         otherPlayer.setDepth(8);
         otherGun.setDepth(9);
       }
-      else if (playerInfo.playernumber == 2) {
+      else if (playerInfo.playernumber == 8) {
         otherPlayer.setDepth(6);
         otherGun.setDepth(7);
-        otherPlayer.tint = 0xeb4034
       }
-      else if (playerInfo.playernumber == 3) {
+      else if (playerInfo.playernumber == 9) {
         otherPlayer.setDepth(4);
-        otherGun.setDepth(5);
-        otherPlayer.tint = 0x2f944a
+        otherGun.setDepth(5)
       }
-      else if (playerInfo.playernumber == 4) {
+      else if (playerInfo.playernumber == 10) {
         otherPlayer.setDepth(2);
         otherGun.setDepth(3);
-        otherPlayer.tint = 0x3e13d6
       }
     }
     function bulletotherplayer1(body) {
       if (bullet1.active == true) {
-        bullet1.setActive(false)
-        bullet1.setVisible(false)
-        socket.emit('bullethitotherplayer1', {id :body.playerId})
+        if (body.active) {
+          bullet1.setActive(false)
+          bullet1.setVisible(false)
+          socket.emit('bullethitotherplayer1', {id :body.playerId})
+         }
       }
     }
     function bulletotherplayer2(body) {
       if (bullet2.active == true) {
+        if (body.active) {
       bullet2.setActive(false)
       bullet2.setVisible(false)
       socket.emit('bullethitotherplayer2', {id :body.playerId})
+      }
      }
     }
     function bulletotherplayer3(body) {
+              if (body.active) {
       if (bullet3.active == true) {
       bullet3.setActive(false)
       bullet3.setVisible(false)
       socket.emit('bullethitotherplayer3', {id :body.playerId})
     }
     }
+    }
     function bulletotherplayer4(body) {
       if (bullet4.active == true) {
+                if (body.active) {
       bullet4.setActive(false)
       bullet4.setVisible(false)
       socket.emit('bullethitotherplayer4', {id :body.playerId})
     }
     }
+    }
     function bulletotherplayer5(body) {
+              if (body.active) {
       if (bullet5.active == true) {
       bullet5.setActive(false)
       bullet5.setVisible(false)
       socket.emit('bullethitotherplayer5', {id :body.playerId})
     }
     }
+    }
     function bulletotherplayer6(body) {
+              if (body.active) {
       if (bullet6.active == true) {
       bullet6.setActive(false)
       bullet6.setVisible(false)
       socket.emit('bullethitotherplayer6', {id :body.playerId})
     }
     }
+    }
     function bulletotherplayer7(body) {
       if (bullet7.active == true) {
+                if (body.active) {
       bullet7.setActive(false)
       bullet7.setVisible(false)
       socket.emit('bullethitotherplayer7', {id :body.playerId})
     }
     }
+    }
     socket.on('connect_error', error );
     function error(){
-    console.log('Connection Failed');
     self.scene.start('menu')
     }
     socket.on('connect',function(){
@@ -206,6 +219,491 @@ export default class multilevel extends Phaser.Scene {
     socket.on('currentPlayers', function (players) {
         Object.keys(players).forEach(function (id) {
           if (players[id].playerId === socket.id) {
+            map = players[id].map;
+            if (map == 'Remnants') {
+
+            floors.create(20, 1180, 'floor_small');
+            floors.create(20, 1120, 'floor_vertical7');
+            floors.create(20, 1060, 'floor_small').flipY = true;
+        for (var i = 0; i < 2; i++) {
+            floors.create(20, 1020 - i * 40, 'floor_middle');
+        }
+            floors.create(20, 940, 'floor_small');
+            floors.create(20, 860, 'floor_vertical8');
+            floors.create(20, 780, 'floor_side_small');
+            floors.create(20, 400, 'floor_bigvertical');
+            floors.create(20, 20, 'floor_small').flipY = true;
+
+        for (var i = 0; i < 51; i++) {
+            floors.create(60 + i * 40, 20, 'floor_front').flipY = true;
+        }
+            var floorflip1 = floors.create(2100, 20, 'floor_small')
+            floorflip1.flipX = true;
+            floorflip1.flipY = true;
+
+        for (var i = 0; i < 2; i++) {
+            floors.create(60 + i * 40, 1060, 'floor_front').flipY = true;
+        }
+            floors.create(140, 1060, 'floor_bottom_small');
+            floors.create(180, 1060, 'floor_sidemiddle');
+            floors.create(60, 1020, 'floor_middle');
+            floors.create(100, 1020, 'floor_small');
+            floors.create(140, 1020, 'floor_diag');
+            floors.create(60, 980, 'floor_middle');
+            floors.create(100, 980, 'floor_diag');
+            floors.create(60, 940, 'floor_diag');
+
+        for (var i = 0; i < 4; i++) {
+            floors.create(60 + i * 40, 780, 'floor_tube_side');
+        }
+            floors.create(220, 780, 'floor_sidemiddle');
+
+            floors.create(140, 900, 'floor_sidemiddle').flipX = true;
+        for (var i = 0; i < 2; i++) {
+            floors.create(180 + i * 40, 900, 'floor_tube_side');
+        }
+            floors.create(260, 900, 'floor_bottom_small').flipX = true;
+            floors.create(260, 860, 'floor_diag').flipX = true;
+        for (var i = 0; i < 2; i++) {
+            floors.create(300 + i * 40, 900, 'floor_front').flipY = true;
+        }
+            floors.create(300, 860, 'floor_small').flipX = true;
+            floors.create(300, 820, 'floor_diag').flipX = true;
+            floors.create(340, 860, 'floor_middle');
+            floors.create(340, 820, 'floor_front');
+            floors.create(380, 900, 'floor_bottom_small');
+            floors.create(380, 840, 'floor_vertical6');
+            floors.create(420, 900, 'floor_tube_side');
+            floors.create(460, 900, 'floor_sidemiddle');
+
+            floors.create(140, 700, 'floor_sidemiddle').flipX = true;
+            floors.create(180, 700, 'floor_bottom_small').flipX = true;
+            floors.create(180, 660, 'floor_diag').flipX = true;
+            floors.create(220, 700, 'floor_diag').flipY = true;
+            floors.create(220, 660, 'floor_diag_small').flipY = true;
+            floors.create(220, 620, 'floor_diag').flipX = true;
+            floors.create(260, 660, 'floor_diag').flipY = true;
+            floors.create(260, 620, 'floor_triple_small');
+            floors.create(260, 580, 'floor_topmiddle');
+            floors.create(300, 620, 'floor_sidemiddle');
+
+            floors.create(260, 1180, 'floor_small').flipX = true;
+            floors.create(260, 1140, 'floor_diag').flipX = true;
+            floors.create(300, 1180, 'floor_middle');
+            floors.create(300, 1140, 'floor_middle_small');
+            floors.create(300, 1100, 'floor_topmiddle');
+            floors.create(340, 1180, 'floor_small');
+            floors.create(340, 1140, 'floor_diag');
+
+            floors.create(260, 1020, 'floor_sidemiddle').flipX = true;
+            floors.create(300, 1020, 'floor_tube_side')
+            floors.create(340, 1020, 'floor_sidemiddle')
+
+            floors.create(420, 1060, 'floor_sidemiddle').flipX = true;
+            floors.create(460, 1060, 'floor_bottom_small').flipX = true;
+            floors.create(460, 1020, 'floor_diag').flipX = true;
+            floors.create(500, 1060, 'floor_front').flipY = true;
+            floors.create(500, 1020, 'floor_small').flipX = true;
+            floors.create(500, 980, 'floor_diag').flipX = true;
+            floors.create(540, 1060, 'floor_diag').flipY = true;
+            floors.create(540, 1020, 'floor_small').flipY = true;
+            floors.create(540, 980, 'floor_small').flipX = true;
+            floors.create(540, 940, 'floor_diag').flipX = true;
+            floors.create(580, 1020, 'floor_diag').flipY = true;
+            floors.create(580, 980, 'floor_small').flipY = true;
+            floors.create(580, 940, 'floor_small').flipX = true;
+            floors.create(580, 900, 'floor_diag').flipX = true;
+            floors.create(620, 980, 'floor_diag').flipY = true;
+            floors.create(620, 940, 'floor_small').flipY = true;
+            floors.create(620, 900, 'floor_front');
+            floors.create(660, 940, 'floor_diag').flipY = true;
+            floors.create(660, 900, 'floor_bottom_small').flipY = true;
+            floors.create(700, 900, 'floor_tube_side');
+            floors.create(740, 900, 'floor_sidemiddle');
+
+            floors.create(380, 660, 'floor_sidemiddle').flipX = true;
+            floors.create(420, 660, 'floor_bottom_small').flipX = true;
+            floors.create(420, 620, 'floor_diag').flipX = true;
+        for (var i = 0; i < 4; i++) {
+            floors.create(460 + i * 40 , 660, 'floor_front').flipY = true;
+        }
+            floors.create(460, 620, 'floor_small').flipX = true;
+            floors.create(460, 580, 'floor_diag').flipX = true;
+        for (var i = 0; i < 4.; i++) {
+            floors.create(500 + i * 40, 620, 'floor_middle');
+        }
+        for (var i = 0; i < 4; i++) {
+            floors.create(500 + i * 40, 580, 'floor_front');
+        }
+            var floorflip2 = floors.create(620, 700, 'floor_diag');
+            floorflip2.flipX = true;
+            floorflip2.flipY = true;
+            var floorflip3 = floors.create(620, 660, 'floor_small');
+            floorflip3.flipX = true;
+            floorflip3.flipY = true;
+            floors.create(660, 580, 'floor_diag');
+            floors.create(660, 740, 'floor_topmiddle').flipY = true;
+            floors.create(660, 700, 'floor_middle_small').flipY = true;
+            floors.create(660, 660, 'floor_middle');
+            floors.create(660, 620, 'floor_small');
+            floors.create(700, 700, 'floor_diag').flipY = true;
+            floors.create(700, 660, 'floor_side_small');
+            floors.create(700, 620, 'floor_diag')
+            floors.create(740, 660, 'floor_sidemiddle')
+
+            floors.create(380, 460, 'floor_sidemiddle').flipX = true;
+            floors.create(420, 460, 'floor_bottom_small').flipX = true;
+            floors.create(420, 420, 'floor_diag').flipX = true;
+        for (var i = 0; i < 5; i++) {
+            floors.create(460 + i * 40, 460, 'floor_front').flipY = true;
+        }
+            floors.create(460, 420, 'floor_small').flipX = true;
+            floors.create(460, 380, 'floor_diag').flipX = true;
+            floors.create(500, 420, 'floor_middle');
+            floors.create(500, 380, 'floor_small').flipX = true;
+            floors.create(500, 340, 'floor_diag').flipX = true;
+            floors.create(540, 380, 'floor_middle');
+            floors.create(540, 340, 'floor_middle_small');
+            floors.create(540, 300, 'floor_topmiddle');
+        for (var i = 0; i < 2; i++) {
+            floors.create(540, 420 - i * 40, 'floor_middle');
+            floors.create(580 + i * 40, 340, 'floor_front');
+            floors.create(580, 420 - i * 40, 'floor_middle');
+            floors.create(620, 420 - i * 40, 'floor_middle');
+        }
+            floors.create(660, 460, 'floor_diag').flipY = true;
+            floors.create(660, 420, 'floor_small').flipY = true;
+            floors.create(660, 380, 'floor_small');
+            floors.create(660, 340, 'floor_diag');
+            floors.create(700, 420, 'floor_diag').flipY = true;
+            floors.create(700, 380, 'floor_bottom_small').flipY = true;
+            floors.create(740, 380, 'floor_tube_side');
+            floors.create(780, 380, 'floor_sidemiddle');
+
+            floors.create(620, 1140, 'floor_diag').flipX = true;
+            floors.create(700, 1100, 'floor_small').flipX = true;
+            floors.create(620, 1180, 'floor_small').flipX = true;
+            floors.create(740, 1180, 'floor_small');
+            floors.create(660, 1140, 'floor_small').flipX = true;
+            floors.create(660, 1100, 'floor_diag').flipX = true;
+            floors.create(700, 1060, 'floor_diag').flipX = true;
+            floors.create(700, 1140, 'floor_middle');
+            floors.create(740, 1080, 'floor_vertical1');
+
+            floors.create(820, 1000, 'floor_vertical2');
+
+            floors.create(740, 820, 'floor_sidemiddle').flipX = true;
+            floors.create(780, 820, 'floor_tube_side');
+            floors.create(820, 820, 'floor_sidemiddle');
+
+            floors.create(900, 1180, 'floor_small').flipX = true;
+            floors.create(900, 1140, 'floor_diag').flipX = true;
+            floors.create(940, 1180, 'floor_middle');
+            floors.create(940, 1140, 'floor_small').flipX = true;
+            floors.create(940, 1100, 'floor_diag').flipX = true;
+            floors.create(980, 1180, 'floor_small')
+            floors.create(980, 1100, 'floor_vertical3');
+
+            floors.create(900, 940, 'floor_sidemiddle').flipX = true;
+        for (var i = 0; i < 2; i++) {
+            floors.create(940 + i * 40, 940, 'floor_tube_side');
+        }
+            floors.create(1020, 940, 'floor_sidemiddle');
+
+            floors.create(940, 820, 'floor_sidemiddle').flipX = true;
+        for (var i = 0; i < 5; i++) {
+            floors.create(980 + i * 40, 820, 'floor_tube_side');
+        }
+            floors.create(1180, 820, 'floor_sidemiddle');
+
+            floors.create(1060, 620, 'floor_vertical5');
+
+            floors.create(780, 500, 'floor_sidemiddle').flipX = true;
+        for (var i = 0; i < 2; i++) {
+            floors.create(820 + i * 40, 500, 'floor_tube_side');
+        }
+            floors.create(900, 500, 'floor_bottom_middle_small');
+            floors.create(900, 460, 'floor_topmiddle');
+        for (var i = 0; i < 3; i++) {
+            floors.create(940 + i * 40, 500, 'floor_tube_side');
+        }
+            floors.create(1060, 500, 'floor_bottom_middle_small').flipY = true;
+        for (var i = 0; i < 3; i++) {
+            floors.create(1100 + i * 40, 500, 'floor_tube_side');
+        }
+            floors.create(1220, 500, 'floor_bottom_middle_small');
+            floors.create(1220, 460, 'floor_topmiddle');
+        for (var i = 0; i < 2; i++) {
+            floors.create(1260 + i * 40, 500, 'floor_tube_side');
+        }
+            floors.create(1340, 500, 'floor_sidemiddle');
+
+            floors.create(1060, 1120, 'floor_vertical4');
+
+            floors.create(900, 660, 'floor_sidemiddle').flipX = true;
+            floors.create(940, 660, 'floor_tube_side')
+            floors.create(980, 660, 'floor_sidemiddle')
+
+            floors.create(1100, 940, 'floor_sidemiddle').flipX = true;
+        for (var i = 0; i < 2; i++) {
+            floors.create(1140 + i * 40, 940, 'floor_tube_side');
+        }
+            floors.create(1220, 940, 'floor_sidemiddle');
+
+            floors.create(1140, 660, 'floor_sidemiddle').flipX = true;
+            floors.create(1180, 660, 'floor_tube_side')
+            floors.create(1220, 660, 'floor_sidemiddle')
+
+            floors.create(1020, 1180, 'floor_front');
+            floors.create(1060, 1180, 'floor_middle_small');
+            floors.create(1100, 1180, 'floor_front');
+
+            floors.create(1140, 1180, 'floor_small').flipX = true;
+            floors.create(1140, 1100, 'floor_vertical3').flipX = true;
+            floors.create(1140, 1060, 'floor_topmiddle')
+            floors.create(1180, 1180, 'floor_middle');
+            floors.create(1180, 1140, 'floor_small');
+            floors.create(1180, 1100, 'floor_diag');
+            floors.create(1220, 1180, 'floor_small');
+            floors.create(1220, 1140, 'floor_diag');
+
+            floors.create(1380, 1080, 'floor_vertical1').flipX = true;
+            floors.create(1380, 1180, 'floor_small').flipX = true;
+            floors.create(1420, 1180, 'floor_middle');
+            floors.create(1420, 1140, 'floor_middle');
+            floors.create(1420, 1100, 'floor_small');
+            floors.create(1420, 1060, 'floor_diag');
+            floors.create(1460, 1180, 'floor_middle');
+            floors.create(1460, 1140, 'floor_small');
+            floors.create(1460, 1100, 'floor_diag');
+            floors.create(1500, 1180, 'floor_small');
+            floors.create(1500, 1140, 'floor_diag');
+
+            floors.create(1780, 1180, 'floor_small').flipX = true;
+            floors.create(1780, 1140, 'floor_diag').flipX = true;
+            floors.create(1820, 1180, 'floor_middle');
+            floors.create(1820, 1140, 'floor_middle_small');
+            floors.create(1820, 1100, 'floor_topmiddle');
+            floors.create(1860, 1180, 'floor_small');
+            floors.create(1860, 1140, 'floor_diag')
+
+            floors.create(860, 340, 'floor_sidemiddle').flipX = true;
+            floors.create(900, 340, 'floor_bottom_small').flipX = true;
+            floors.create(900, 300, 'floor_side_small_line').flipX = true;
+            floors.create(900, 260, 'floor_topmiddle');
+            floors.create(940, 340, 'floor_bottom_small');
+            floors.create(940, 300, 'floor_diag');
+            floors.create(980, 360, 'floor_vertical9');
+
+            floors.create(1060, 340, 'floor_vertical10');
+            floors.create(980, 220, 'floor_sidemiddle').flipX = true;
+            var floorflip4 = floors.create(1020, 260, 'floor_diag');
+            floorflip4.flipX = true;
+            floorflip4.flipY = true;
+            floors.create(1020, 220, 'floor_side_small').flipX = true;
+            floors.create(1020, 180, 'floor_diag').flipX = true;
+            floors.create(1060, 260, 'floor_middle_small').flipY = true;
+            floors.create(1060, 220, 'floor_middle');
+            floors.create(1060, 180, 'floor_middle_small');
+            floors.create(1060, 140, 'floor_topmiddle');
+            floors.create(1100, 260, 'floor_diag').flipY = true;
+            floors.create(1100, 220, 'floor_side_small');
+            floors.create(1100, 180, 'floor_diag');
+            floors.create(1140, 220, 'floor_sidemiddle');
+
+            floors.create(1140, 360, 'floor_vertical9').flipX = true;
+            floors.create(1180, 340, 'floor_bottom_small').flipX = true;
+            floors.create(1180, 300, 'floor_diag').flipX = true;
+            floors.create(1220, 340, 'floor_bottom_small');
+            floors.create(1220, 300, 'floor_side_small_line');
+            floors.create(1220, 260, 'floor_topmiddle');
+            floors.create(1260, 340, 'floor_sidemiddle');
+
+            floors.create(1340, 380, 'floor_sidemiddle').flipX = true;
+            floors.create(1380, 380, 'floor_tube_side');
+            var floorflip5 = floors.create(1420, 380, 'floor_bottom_small');
+            floorflip5.flipX = true;
+            floorflip5.flipY = true;
+            var floorflip6 = floors.create(1420, 420, 'floor_diag');
+            floorflip6.flipX = true;
+            floorflip6.flipY = true;
+            var floorflip7 = floors.create(1460, 460, 'floor_diag');
+            floorflip7.flipX = true;
+            floorflip7.flipY = true;
+            var floorflip8 = floors.create(1460, 420, 'floor_small');
+            floorflip8.flipX = true;
+            floorflip8.flipY = true;
+            floors.create(1460, 380, 'floor_small').flipX = true;
+            floors.create(1460, 340, 'floor_diag').flipX = true;
+        for (var i = 0; i < 5; i++) {
+            floors.create(1500 + i * 40, 460, 'floor_front').flipY = true;
+        }
+        for (var i = 0; i < 2; i++) {
+            floors.create(1500 + i * 40, 340, 'floor_front');
+            floors.create(1500, 420 - i * 40, 'floor_middle');
+            floors.create(1540, 420 - i * 40, 'floor_middle');
+            floors.create(1580, 420 - i * 40, 'floor_middle');
+        }
+            floors.create(1580, 340, 'floor_middle_small');
+            floors.create(1580, 300, 'floor_topmiddle');
+            floors.create(1620, 420, 'floor_middle');
+            floors.create(1620, 380, 'floor_small');
+            floors.create(1620, 340, 'floor_diag');
+            floors.create(1660, 420, 'floor_small');
+            floors.create(1660, 380, 'floor_diag');
+            floors.create(1700, 420, 'floor_diag');
+            floors.create(1700, 460, 'floor_bottom_small');
+            floors.create(1740, 460, 'floor_sidemiddle');
+
+            floors.create(1380, 660, 'floor_sidemiddle').flipX = true;
+            var floorflip9 = floors.create(1420, 700, 'floor_diag');
+            floorflip9.flipX = true;
+            floorflip9.flipY = true;
+            floors.create(1420, 660, 'floor_side_small').flipX = true;;
+            floors.create(1420, 620, 'floor_diag').flipX = true;
+            floors.create(1460, 740, 'floor_topmiddle').flipY = true;
+            floors.create(1460, 700, 'floor_middle_small').flipY = true;
+            floors.create(1460, 660, 'floor_middle');
+            floors.create(1460, 620, 'floor_small').flipX = true;
+            floors.create(1460, 580, 'floor_diag').flipX = true;
+            floors.create(1500, 700, 'floor_diag').flipY = true;
+            floors.create(1500, 660, 'floor_small').flipY = true;
+            floors.create(1500, 620, 'floor_middle');
+        for (var i = 0; i < 4; i++) {
+            floors.create(1500 + i * 40, 580, 'floor_front');
+            floors.create(1500 + i * 40, 620, 'floor_middle');
+            floors.create(1540 + i * 40, 660, 'floor_front').flipY = true;
+        }
+            floors.create(1660, 620, 'floor_small');
+            floors.create(1660, 580, 'floor_diag');
+            floors.create(1700, 660, 'floor_bottom_small');
+            floors.create(1700, 620, 'floor_diag');
+            floors.create(1740, 660, 'floor_sidemiddle');
+
+            floors.create(1300, 820, 'floor_sidemiddle').flipX = true;
+            floors.create(1340, 820, 'floor_tube_side');
+            floors.create(1380, 820, 'floor_sidemiddle');
+
+            floors.create(1380, 900, 'floor_sidemiddle').flipX = true;
+            floors.create(1420, 900, 'floor_tube_side');
+            var floorflip10 = floors.create(1460, 900, 'floor_bottom_small');
+            floorflip10.flipX = true;
+            floorflip10.flipY = true;
+            var floorflip11 = floors.create(1460, 940, 'floor_diag');
+            floorflip11.flipX = true;
+            floorflip11.flipY = true;
+            var floorflip15 = floors.create(1500, 940, 'floor_small');
+            floorflip15.flipX = true;
+            floorflip15.flipY = true;
+            var floorflip15 = floors.create(1540, 980, 'floor_small');
+            floorflip15.flipX = true;
+            floorflip15.flipY = true;
+            var floorflip15 = floors.create(1580, 1020, 'floor_small');
+            floorflip15.flipX = true;
+            floorflip15.flipY = true;
+            var floorflip12 = floors.create(1500, 980, 'floor_diag');
+            floorflip12.flipX = true;
+            floorflip12.flipY = true;
+            floors.create(1500, 900, 'floor_front');
+            var floorflip13 = floors.create(1540, 1020, 'floor_diag');
+            floorflip13.flipX = true;
+            floorflip13.flipY = true;
+            floors.create(1540, 940, 'floor_small');
+            floors.create(1540, 900, 'floor_diag');
+            var floorflip14 = floors.create(1580, 1060, 'floor_diag');
+            floorflip14.flipX = true;
+            floorflip14.flipY = true;
+            floors.create(1580, 980, 'floor_small');
+            floors.create(1580, 940, 'floor_diag');
+            floors.create(1620, 1060, 'floor_front').flipY = true;
+            floors.create(1620, 1020, 'floor_small');
+            floors.create(1620, 980, 'floor_diag');
+            floors.create(1660, 1060, 'floor_bottom_small');
+            floors.create(1660, 1020, 'floor_diag');
+            floors.create(1700, 1060, 'floor_sidemiddle');
+
+            floors.create(1660, 900, 'floor_sidemiddle').flipX = true;
+            floors.create(1700, 900, 'floor_tube_side');
+            floors.create(1740, 840, 'floor_vertical6').flipX = true;
+            floors.create(1740, 900, 'floor_bottom_small').flipX = true;
+            floors.create(1780, 900, 'floor_front').flipY = true;
+            floors.create(1780, 860, 'floor_middle');
+            floors.create(1780, 820, 'floor_front');
+            floors.create(1820, 900, 'floor_front').flipY = true;
+            floors.create(1820, 860, 'floor_small');
+            floors.create(1820, 820, 'floor_diag');
+            floors.create(1860, 900, 'floor_bottom_small');
+            floors.create(1860, 860, 'floor_diag');
+            floors.create(1900, 900, 'floor_tube_side');
+            floors.create(1940, 900, 'floor_tube_side');
+            floors.create(1980, 900, 'floor_sidemiddle');
+
+            floors.create(1820, 620, 'floor_sidemiddle').flipX = true;
+            var floorflip14 = floors.create(1860, 660, 'floor_diag');
+            floorflip14.flipX = true;
+            floorflip14.flipY = true;
+            floors.create(1860, 620, 'floor_triple_small').flipX = true;
+            floors.create(1860, 580, 'floor_topmiddle');
+            var floorflip14 = floors.create(1900, 700, 'floor_diag');
+            floorflip14.flipX = true;
+            floorflip14.flipY = true;
+            floors.create(1900, 660, 'floor_diag_small');
+            floors.create(1900, 620, 'floor_diag');
+            floors.create(1940, 700, 'floor_bottom_small');
+            floors.create(1940, 660, 'floor_diag');
+            floors.create(1980, 700, 'floor_sidemiddle');
+
+            floors.create(1900, 780, 'floor_sidemiddle').flipX = true;
+        for (var i = 0; i < 4; i++) {
+            floors.create(1940 + i * 40, 780, 'floor_tube_side');
+        }
+
+            floors.create(1300, 1000, 'floor_vertical2');
+
+            floors.create(1780, 1020, 'floor_sidemiddle').flipX = true;
+            floors.create(1820, 1020, 'floor_tube_side');
+            floors.create(1860, 1020, 'floor_sidemiddle');
+
+            floors.create(1940, 1060, 'floor_sidemiddle').flipX = true;
+            floors.create(1980, 1020, 'floor_diag').flipX = true;
+            floors.create(1980, 1060, 'floor_bottom_small').flipX = true;
+            floors.create(2020, 1020, 'floor_small').flipX = true;
+            floors.create(2020, 980, 'floor_diag').flipX = true;
+            floors.create(2020, 1060, 'floor_front').flipY = true;
+            floors.create(2060, 1060, 'floor_front').flipY = true;
+            floors.create(2060, 1020, 'floor_middle');
+            floors.create(2060, 980, 'floor_small').flipX = true;
+            floors.create(2060, 940, 'floor_diag').flipX = true;
+
+            floors.create(2100, 400, 'floor_bigvertical').flipX = true;
+            floors.create(2100, 780, 'floor_side_small').flipX = true;
+            floors.create(2100, 860, 'floor_vertical8').flipX = true;
+            floors.create(2100, 940, 'floor_small').flipX = true;
+        for (var i = 0; i < 2; i++) {
+            floors.create(2100, 980 + i * 40, 'floor_middle');
+        }
+            var floorflip14 = floors.create(2100, 1060, 'floor_small');
+            floorflip14.flipX = true;
+            floorflip14.flipY = true;
+            floors.create(2100, 1120, 'floor_vertical7').flipX = true;
+            floors.create(2100, 1180, 'floor_small').flipX = true;
+        for (var i = 0; i < 2; i++) {
+            floors.create(660 + i * 40, 1180, 'floor_middle');
+        }
+        for (var i = 0; i < 3; i++) {
+            floors.create(780 + i * 40, 1180, 'floor_front');
+            floors.create(1260 + i * 40, 1180, 'floor_front');
+
+        }
+        for (var i = 0; i < 5; i++) {
+            floors.create(60 + i * 40, 1180, 'floor_front');
+            floors.create(1900 + i * 40, 1180, 'floor_front');
+        }
+        for (var i = 0; i < 6; i++) {
+            floors.create(380 + i * 40, 1180, 'floor_front');
+            floors.create(1540 + i * 40, 1180, 'floor_front');
+        }
+      }
             addPlayer(self, players[id]);
           } else {
             addOtherPlayers(self, players[id]);
@@ -223,7 +721,7 @@ export default class multilevel extends Phaser.Scene {
           self.otherNames.add(otherName);
         }
       });
-    })
+    });
     socket.on('disconnected', function (playerInfo) {
         self.otherPlayers.getChildren().forEach(function (otherPlayer) {
           if (playerInfo.playerId === otherPlayer.playerId) {
@@ -258,6 +756,7 @@ export default class multilevel extends Phaser.Scene {
       self.otherPlayers.getChildren().forEach(function (otherPlayer) {
         if (playerInfo.playerId === otherPlayer.playerId) {
           otherPlayer.setVisible(playerInfo.playeralive);
+          otherPlayer.setActive(playerInfo.playeralive);
         }
       });
         self.otherGuns.getChildren().forEach(function () {
@@ -280,6 +779,7 @@ export default class multilevel extends Phaser.Scene {
       self.otherPlayers.getChildren().forEach(function (otherPlayer) {
         if (playerInfo.playerId === otherPlayer.playerId) {
           otherPlayer.setVisible(playerInfo.playeralive);
+          otherPlayer.setActive(playerInfo.playeralive);
         }
       });
         self.otherGuns.getChildren().forEach(function () {
@@ -377,7 +877,6 @@ export default class multilevel extends Phaser.Scene {
       self.otherHps.getChildren().forEach(function () {
         if (playerInfo.playerId === otherPlayer.playerId) {
           otherHp.text = playerInfo.health;
-          console.log(playerInfo.health);
         }
       });
     });
@@ -410,487 +909,6 @@ this.anims.create({
 });
 //floors
           var floors = this.physics.add.staticGroup()
-          floors.create(20, 1180, 'floor_small');
-          floors.create(20, 1120, 'floor_vertical7');
-          floors.create(20, 1060, 'floor_small').flipY = true;
-      for (var i = 0; i < 2; i++) {
-          floors.create(20, 1020 - i * 40, 'floor_middle');
-      }
-          floors.create(20, 940, 'floor_small');
-          floors.create(20, 860, 'floor_vertical8');
-          floors.create(20, 780, 'floor_side_small');
-          floors.create(20, 400, 'floor_bigvertical');
-          floors.create(20, 20, 'floor_small').flipY = true;
-
-      for (var i = 0; i < 51; i++) {
-          floors.create(60 + i * 40, 20, 'floor_front').flipY = true;
-      }
-          var floorflip1 = floors.create(2100, 20, 'floor_small')
-          floorflip1.flipX = true;
-          floorflip1.flipY = true;
-
-      for (var i = 0; i < 2; i++) {
-          floors.create(60 + i * 40, 1060, 'floor_front').flipY = true;
-      }
-          floors.create(140, 1060, 'floor_bottom_small');
-          floors.create(180, 1060, 'floor_sidemiddle');
-          floors.create(60, 1020, 'floor_middle');
-          floors.create(100, 1020, 'floor_small');
-          floors.create(140, 1020, 'floor_diag');
-          floors.create(60, 980, 'floor_middle');
-          floors.create(100, 980, 'floor_diag');
-          floors.create(60, 940, 'floor_diag');
-
-      for (var i = 0; i < 4; i++) {
-          floors.create(60 + i * 40, 780, 'floor_tube_side');
-      }
-          floors.create(220, 780, 'floor_sidemiddle');
-
-          floors.create(140, 900, 'floor_sidemiddle').flipX = true;
-      for (var i = 0; i < 2; i++) {
-          floors.create(180 + i * 40, 900, 'floor_tube_side');
-      }
-          floors.create(260, 900, 'floor_bottom_small').flipX = true;
-          floors.create(260, 860, 'floor_diag').flipX = true;
-      for (var i = 0; i < 2; i++) {
-          floors.create(300 + i * 40, 900, 'floor_front').flipY = true;
-      }
-          floors.create(300, 860, 'floor_small').flipX = true;
-          floors.create(300, 820, 'floor_diag').flipX = true;
-          floors.create(340, 860, 'floor_middle');
-          floors.create(340, 820, 'floor_front');
-          floors.create(380, 900, 'floor_bottom_small');
-          floors.create(380, 840, 'floor_vertical6');
-          floors.create(420, 900, 'floor_tube_side');
-          floors.create(460, 900, 'floor_sidemiddle');
-
-          floors.create(140, 700, 'floor_sidemiddle').flipX = true;
-          floors.create(180, 700, 'floor_bottom_small').flipX = true;
-          floors.create(180, 660, 'floor_diag').flipX = true;
-          floors.create(220, 700, 'floor_diag').flipY = true;
-          floors.create(220, 660, 'floor_diag_small').flipY = true;
-          floors.create(220, 620, 'floor_diag').flipX = true;
-          floors.create(260, 660, 'floor_diag').flipY = true;
-          floors.create(260, 620, 'floor_triple_small');
-          floors.create(260, 580, 'floor_topmiddle');
-          floors.create(300, 620, 'floor_sidemiddle');
-
-          floors.create(260, 1180, 'floor_small').flipX = true;
-          floors.create(260, 1140, 'floor_diag').flipX = true;
-          floors.create(300, 1180, 'floor_middle');
-          floors.create(300, 1140, 'floor_middle_small');
-          floors.create(300, 1100, 'floor_topmiddle');
-          floors.create(340, 1180, 'floor_small');
-          floors.create(340, 1140, 'floor_diag');
-
-          floors.create(260, 1020, 'floor_sidemiddle').flipX = true;
-          floors.create(300, 1020, 'floor_tube_side')
-          floors.create(340, 1020, 'floor_sidemiddle')
-
-          floors.create(420, 1060, 'floor_sidemiddle').flipX = true;
-          floors.create(460, 1060, 'floor_bottom_small').flipX = true;
-          floors.create(460, 1020, 'floor_diag').flipX = true;
-          floors.create(500, 1060, 'floor_front').flipY = true;
-          floors.create(500, 1020, 'floor_small').flipX = true;
-          floors.create(500, 980, 'floor_diag').flipX = true;
-          floors.create(540, 1060, 'floor_diag').flipY = true;
-          floors.create(540, 1020, 'floor_small').flipY = true;
-          floors.create(540, 980, 'floor_small').flipX = true;
-          floors.create(540, 940, 'floor_diag').flipX = true;
-          floors.create(580, 1020, 'floor_diag').flipY = true;
-          floors.create(580, 980, 'floor_small').flipY = true;
-          floors.create(580, 940, 'floor_small').flipX = true;
-          floors.create(580, 900, 'floor_diag').flipX = true;
-          floors.create(620, 980, 'floor_diag').flipY = true;
-          floors.create(620, 940, 'floor_small').flipY = true;
-          floors.create(620, 900, 'floor_front');
-          floors.create(660, 940, 'floor_diag').flipY = true;
-          floors.create(660, 900, 'floor_bottom_small').flipY = true;
-          floors.create(700, 900, 'floor_tube_side');
-          floors.create(740, 900, 'floor_sidemiddle');
-
-          floors.create(380, 660, 'floor_sidemiddle').flipX = true;
-          floors.create(420, 660, 'floor_bottom_small').flipX = true;
-          floors.create(420, 620, 'floor_diag').flipX = true;
-      for (var i = 0; i < 4; i++) {
-          floors.create(460 + i * 40 , 660, 'floor_front').flipY = true;
-      }
-          floors.create(460, 620, 'floor_small').flipX = true;
-          floors.create(460, 580, 'floor_diag').flipX = true;
-      for (var i = 0; i < 4.; i++) {
-          floors.create(500 + i * 40, 620, 'floor_middle');
-      }
-      for (var i = 0; i < 4; i++) {
-          floors.create(500 + i * 40, 580, 'floor_front');
-      }
-          var floorflip2 = floors.create(620, 700, 'floor_diag');
-          floorflip2.flipX = true;
-          floorflip2.flipY = true;
-          var floorflip3 = floors.create(620, 660, 'floor_small');
-          floorflip3.flipX = true;
-          floorflip3.flipY = true;
-          floors.create(660, 580, 'floor_diag');
-          floors.create(660, 740, 'floor_topmiddle').flipY = true;
-          floors.create(660, 700, 'floor_middle_small').flipY = true;
-          floors.create(660, 660, 'floor_middle');
-          floors.create(660, 620, 'floor_small');
-          floors.create(700, 700, 'floor_diag').flipY = true;
-          floors.create(700, 660, 'floor_side_small');
-          floors.create(700, 620, 'floor_diag')
-          floors.create(740, 660, 'floor_sidemiddle')
-
-          floors.create(380, 460, 'floor_sidemiddle').flipX = true;
-          floors.create(420, 460, 'floor_bottom_small').flipX = true;
-          floors.create(420, 420, 'floor_diag').flipX = true;
-      for (var i = 0; i < 5; i++) {
-          floors.create(460 + i * 40, 460, 'floor_front').flipY = true;
-      }
-          floors.create(460, 420, 'floor_small').flipX = true;
-          floors.create(460, 380, 'floor_diag').flipX = true;
-          floors.create(500, 420, 'floor_middle');
-          floors.create(500, 380, 'floor_small').flipX = true;
-          floors.create(500, 340, 'floor_diag').flipX = true;
-          floors.create(540, 380, 'floor_middle');
-          floors.create(540, 340, 'floor_middle_small');
-          floors.create(540, 300, 'floor_topmiddle');
-      for (var i = 0; i < 2; i++) {
-          floors.create(540, 420 - i * 40, 'floor_middle');
-          floors.create(580 + i * 40, 340, 'floor_front');
-          floors.create(580, 420 - i * 40, 'floor_middle');
-          floors.create(620, 420 - i * 40, 'floor_middle');
-      }
-          floors.create(660, 460, 'floor_diag').flipY = true;
-          floors.create(660, 420, 'floor_small').flipY = true;
-          floors.create(660, 380, 'floor_small');
-          floors.create(660, 340, 'floor_diag');
-          floors.create(700, 420, 'floor_diag').flipY = true;
-          floors.create(700, 380, 'floor_bottom_small').flipY = true;
-          floors.create(740, 380, 'floor_tube_side');
-          floors.create(780, 380, 'floor_sidemiddle');
-
-          floors.create(620, 1140, 'floor_diag').flipX = true;
-          floors.create(700, 1100, 'floor_small').flipX = true;
-          floors.create(620, 1180, 'floor_small').flipX = true;
-          floors.create(740, 1180, 'floor_small');
-          floors.create(660, 1140, 'floor_small').flipX = true;
-          floors.create(660, 1100, 'floor_diag').flipX = true;
-          floors.create(700, 1060, 'floor_diag').flipX = true;
-          floors.create(700, 1140, 'floor_middle');
-          floors.create(740, 1080, 'floor_vertical1');
-
-          floors.create(820, 1000, 'floor_vertical2');
-
-          floors.create(740, 820, 'floor_sidemiddle').flipX = true;
-          floors.create(780, 820, 'floor_tube_side');
-          floors.create(820, 820, 'floor_sidemiddle');
-
-          floors.create(900, 1180, 'floor_small').flipX = true;
-          floors.create(900, 1140, 'floor_diag').flipX = true;
-          floors.create(940, 1180, 'floor_middle');
-          floors.create(940, 1140, 'floor_small').flipX = true;
-          floors.create(940, 1100, 'floor_diag').flipX = true;
-          floors.create(980, 1180, 'floor_small')
-          floors.create(980, 1100, 'floor_vertical3');
-
-          floors.create(900, 940, 'floor_sidemiddle').flipX = true;
-      for (var i = 0; i < 2; i++) {
-          floors.create(940 + i * 40, 940, 'floor_tube_side');
-      }
-          floors.create(1020, 940, 'floor_sidemiddle');
-
-          floors.create(940, 820, 'floor_sidemiddle').flipX = true;
-      for (var i = 0; i < 5; i++) {
-          floors.create(980 + i * 40, 820, 'floor_tube_side');
-      }
-          floors.create(1180, 820, 'floor_sidemiddle');
-
-          floors.create(1060, 620, 'floor_vertical5');
-
-          floors.create(780, 500, 'floor_sidemiddle').flipX = true;
-      for (var i = 0; i < 2; i++) {
-          floors.create(820 + i * 40, 500, 'floor_tube_side');
-      }
-          floors.create(900, 500, 'floor_bottom_middle_small');
-          floors.create(900, 460, 'floor_topmiddle');
-      for (var i = 0; i < 3; i++) {
-          floors.create(940 + i * 40, 500, 'floor_tube_side');
-      }
-          floors.create(1060, 500, 'floor_bottom_middle_small').flipY = true;
-      for (var i = 0; i < 3; i++) {
-          floors.create(1100 + i * 40, 500, 'floor_tube_side');
-      }
-          floors.create(1220, 500, 'floor_bottom_middle_small');
-          floors.create(1220, 460, 'floor_topmiddle');
-      for (var i = 0; i < 2; i++) {
-          floors.create(1260 + i * 40, 500, 'floor_tube_side');
-      }
-          floors.create(1340, 500, 'floor_sidemiddle');
-
-          floors.create(1060, 1120, 'floor_vertical4');
-
-          floors.create(900, 660, 'floor_sidemiddle').flipX = true;
-          floors.create(940, 660, 'floor_tube_side')
-          floors.create(980, 660, 'floor_sidemiddle')
-
-          floors.create(1100, 940, 'floor_sidemiddle').flipX = true;
-      for (var i = 0; i < 2; i++) {
-          floors.create(1140 + i * 40, 940, 'floor_tube_side');
-      }
-          floors.create(1220, 940, 'floor_sidemiddle');
-
-          floors.create(1140, 660, 'floor_sidemiddle').flipX = true;
-          floors.create(1180, 660, 'floor_tube_side')
-          floors.create(1220, 660, 'floor_sidemiddle')
-
-          floors.create(1020, 1180, 'floor_front');
-          floors.create(1060, 1180, 'floor_middle_small');
-          floors.create(1100, 1180, 'floor_front');
-
-          floors.create(1140, 1180, 'floor_small').flipX = true;
-          floors.create(1140, 1100, 'floor_vertical3').flipX = true;
-          floors.create(1140, 1060, 'floor_topmiddle')
-          floors.create(1180, 1180, 'floor_middle');
-          floors.create(1180, 1140, 'floor_small');
-          floors.create(1180, 1100, 'floor_diag');
-          floors.create(1220, 1180, 'floor_small');
-          floors.create(1220, 1140, 'floor_diag');
-
-          floors.create(1380, 1080, 'floor_vertical1').flipX = true;
-          floors.create(1380, 1180, 'floor_small').flipX = true;
-          floors.create(1420, 1180, 'floor_middle');
-          floors.create(1420, 1140, 'floor_middle');
-          floors.create(1420, 1100, 'floor_small');
-          floors.create(1420, 1060, 'floor_diag');
-          floors.create(1460, 1180, 'floor_middle');
-          floors.create(1460, 1140, 'floor_small');
-          floors.create(1460, 1100, 'floor_diag');
-          floors.create(1500, 1180, 'floor_small');
-          floors.create(1500, 1140, 'floor_diag');
-
-          floors.create(1780, 1180, 'floor_small').flipX = true;
-          floors.create(1780, 1140, 'floor_diag').flipX = true;
-          floors.create(1820, 1180, 'floor_middle');
-          floors.create(1820, 1140, 'floor_middle_small');
-          floors.create(1820, 1100, 'floor_topmiddle');
-          floors.create(1860, 1180, 'floor_small');
-          floors.create(1860, 1140, 'floor_diag')
-
-          floors.create(860, 340, 'floor_sidemiddle').flipX = true;
-          floors.create(900, 340, 'floor_bottom_small').flipX = true;
-          floors.create(900, 300, 'floor_side_small_line').flipX = true;
-          floors.create(900, 260, 'floor_topmiddle');
-          floors.create(940, 340, 'floor_bottom_small');
-          floors.create(940, 300, 'floor_diag');
-          floors.create(980, 360, 'floor_vertical9');
-
-          floors.create(1060, 340, 'floor_vertical10');
-          floors.create(980, 220, 'floor_sidemiddle').flipX = true;
-          var floorflip4 = floors.create(1020, 260, 'floor_diag');
-          floorflip4.flipX = true;
-          floorflip4.flipY = true;
-          floors.create(1020, 220, 'floor_side_small').flipX = true;
-          floors.create(1020, 180, 'floor_diag').flipX = true;
-          floors.create(1060, 260, 'floor_middle_small').flipY = true;
-          floors.create(1060, 220, 'floor_middle');
-          floors.create(1060, 180, 'floor_middle_small');
-          floors.create(1060, 140, 'floor_topmiddle');
-          floors.create(1100, 260, 'floor_diag').flipY = true;
-          floors.create(1100, 220, 'floor_side_small');
-          floors.create(1100, 180, 'floor_diag');
-          floors.create(1140, 220, 'floor_sidemiddle');
-
-          floors.create(1140, 360, 'floor_vertical9').flipX = true;
-          floors.create(1180, 340, 'floor_bottom_small').flipX = true;
-          floors.create(1180, 300, 'floor_diag').flipX = true;
-          floors.create(1220, 340, 'floor_bottom_small');
-          floors.create(1220, 300, 'floor_side_small_line');
-          floors.create(1220, 260, 'floor_topmiddle');
-          floors.create(1260, 340, 'floor_sidemiddle');
-
-          floors.create(1340, 380, 'floor_sidemiddle').flipX = true;
-          floors.create(1380, 380, 'floor_tube_side');
-          var floorflip5 = floors.create(1420, 380, 'floor_bottom_small');
-          floorflip5.flipX = true;
-          floorflip5.flipY = true;
-          var floorflip6 = floors.create(1420, 420, 'floor_diag');
-          floorflip6.flipX = true;
-          floorflip6.flipY = true;
-          var floorflip7 = floors.create(1460, 460, 'floor_diag');
-          floorflip7.flipX = true;
-          floorflip7.flipY = true;
-          var floorflip8 = floors.create(1460, 420, 'floor_small');
-          floorflip8.flipX = true;
-          floorflip8.flipY = true;
-          floors.create(1460, 380, 'floor_small').flipX = true;
-          floors.create(1460, 340, 'floor_diag').flipX = true;
-      for (var i = 0; i < 5; i++) {
-          floors.create(1500 + i * 40, 460, 'floor_front').flipY = true;
-      }
-      for (var i = 0; i < 2; i++) {
-          floors.create(1500 + i * 40, 340, 'floor_front');
-          floors.create(1500, 420 - i * 40, 'floor_middle');
-          floors.create(1540, 420 - i * 40, 'floor_middle');
-          floors.create(1580, 420 - i * 40, 'floor_middle');
-      }
-          floors.create(1580, 340, 'floor_middle_small');
-          floors.create(1580, 300, 'floor_topmiddle');
-          floors.create(1620, 420, 'floor_middle');
-          floors.create(1620, 380, 'floor_small');
-          floors.create(1620, 340, 'floor_diag');
-          floors.create(1660, 420, 'floor_small');
-          floors.create(1660, 380, 'floor_diag');
-          floors.create(1700, 420, 'floor_diag');
-          floors.create(1700, 460, 'floor_bottom_small');
-          floors.create(1740, 460, 'floor_sidemiddle');
-
-          floors.create(1380, 660, 'floor_sidemiddle').flipX = true;
-          var floorflip9 = floors.create(1420, 700, 'floor_diag');
-          floorflip9.flipX = true;
-          floorflip9.flipY = true;
-          floors.create(1420, 660, 'floor_side_small').flipX = true;;
-          floors.create(1420, 620, 'floor_diag').flipX = true;
-          floors.create(1460, 740, 'floor_topmiddle').flipY = true;
-          floors.create(1460, 700, 'floor_middle_small').flipY = true;
-          floors.create(1460, 660, 'floor_middle');
-          floors.create(1460, 620, 'floor_small').flipX = true;
-          floors.create(1460, 580, 'floor_diag').flipX = true;
-          floors.create(1500, 700, 'floor_diag').flipY = true;
-          floors.create(1500, 660, 'floor_small').flipY = true;
-          floors.create(1500, 620, 'floor_middle');
-      for (var i = 0; i < 4; i++) {
-          floors.create(1500 + i * 40, 580, 'floor_front');
-          floors.create(1500 + i * 40, 620, 'floor_middle');
-          floors.create(1540 + i * 40, 660, 'floor_front').flipY = true;
-      }
-          floors.create(1660, 620, 'floor_small');
-          floors.create(1660, 580, 'floor_diag');
-          floors.create(1700, 660, 'floor_bottom_small');
-          floors.create(1700, 620, 'floor_diag');
-          floors.create(1740, 660, 'floor_sidemiddle');
-
-          floors.create(1300, 820, 'floor_sidemiddle').flipX = true;
-          floors.create(1340, 820, 'floor_tube_side');
-          floors.create(1380, 820, 'floor_sidemiddle');
-
-          floors.create(1380, 900, 'floor_sidemiddle').flipX = true;
-          floors.create(1420, 900, 'floor_tube_side');
-          var floorflip10 = floors.create(1460, 900, 'floor_bottom_small');
-          floorflip10.flipX = true;
-          floorflip10.flipY = true;
-          var floorflip11 = floors.create(1460, 940, 'floor_diag');
-          floorflip11.flipX = true;
-          floorflip11.flipY = true;
-          var floorflip15 = floors.create(1500, 940, 'floor_small');
-          floorflip15.flipX = true;
-          floorflip15.flipY = true;
-          var floorflip15 = floors.create(1540, 980, 'floor_small');
-          floorflip15.flipX = true;
-          floorflip15.flipY = true;
-          var floorflip15 = floors.create(1580, 1020, 'floor_small');
-          floorflip15.flipX = true;
-          floorflip15.flipY = true;
-          var floorflip12 = floors.create(1500, 980, 'floor_diag');
-          floorflip12.flipX = true;
-          floorflip12.flipY = true;
-          floors.create(1500, 900, 'floor_front');
-          var floorflip13 = floors.create(1540, 1020, 'floor_diag');
-          floorflip13.flipX = true;
-          floorflip13.flipY = true;
-          floors.create(1540, 940, 'floor_small');
-          floors.create(1540, 900, 'floor_diag');
-          var floorflip14 = floors.create(1580, 1060, 'floor_diag');
-          floorflip14.flipX = true;
-          floorflip14.flipY = true;
-          floors.create(1580, 980, 'floor_small');
-          floors.create(1580, 940, 'floor_diag');
-          floors.create(1620, 1060, 'floor_front').flipY = true;
-          floors.create(1620, 1020, 'floor_small');
-          floors.create(1620, 980, 'floor_diag');
-          floors.create(1660, 1060, 'floor_bottom_small');
-          floors.create(1660, 1020, 'floor_diag');
-          floors.create(1700, 1060, 'floor_sidemiddle');
-
-          floors.create(1660, 900, 'floor_sidemiddle').flipX = true;
-          floors.create(1700, 900, 'floor_tube_side');
-          floors.create(1740, 840, 'floor_vertical6').flipX = true;
-          floors.create(1740, 900, 'floor_bottom_small').flipX = true;
-          floors.create(1780, 900, 'floor_front').flipY = true;
-          floors.create(1780, 860, 'floor_middle');
-          floors.create(1780, 820, 'floor_front');
-          floors.create(1820, 900, 'floor_front').flipY = true;
-          floors.create(1820, 860, 'floor_small');
-          floors.create(1820, 820, 'floor_diag');
-          floors.create(1860, 900, 'floor_bottom_small');
-          floors.create(1860, 860, 'floor_diag');
-          floors.create(1900, 900, 'floor_tube_side');
-          floors.create(1940, 900, 'floor_tube_side');
-          floors.create(1980, 900, 'floor_sidemiddle');
-
-          floors.create(1820, 620, 'floor_sidemiddle').flipX = true;
-          var floorflip14 = floors.create(1860, 660, 'floor_diag');
-          floorflip14.flipX = true;
-          floorflip14.flipY = true;
-          floors.create(1860, 620, 'floor_triple_small').flipX = true;
-          floors.create(1860, 580, 'floor_topmiddle');
-          var floorflip14 = floors.create(1900, 700, 'floor_diag');
-          floorflip14.flipX = true;
-          floorflip14.flipY = true;
-          floors.create(1900, 660, 'floor_diag_small');
-          floors.create(1900, 620, 'floor_diag');
-          floors.create(1940, 700, 'floor_bottom_small');
-          floors.create(1940, 660, 'floor_diag');
-          floors.create(1980, 700, 'floor_sidemiddle');
-
-          floors.create(1900, 780, 'floor_sidemiddle').flipX = true;
-      for (var i = 0; i < 4; i++) {
-          floors.create(1940 + i * 40, 780, 'floor_tube_side');
-      }
-
-          floors.create(1300, 1000, 'floor_vertical2');
-
-          floors.create(1780, 1020, 'floor_sidemiddle').flipX = true;
-          floors.create(1820, 1020, 'floor_tube_side');
-          floors.create(1860, 1020, 'floor_sidemiddle');
-
-          floors.create(1940, 1060, 'floor_sidemiddle').flipX = true;
-          floors.create(1980, 1020, 'floor_diag').flipX = true;
-          floors.create(1980, 1060, 'floor_bottom_small').flipX = true;
-          floors.create(2020, 1020, 'floor_small').flipX = true;
-          floors.create(2020, 980, 'floor_diag').flipX = true;
-          floors.create(2020, 1060, 'floor_front').flipY = true;
-          floors.create(2060, 1060, 'floor_front').flipY = true;
-          floors.create(2060, 1020, 'floor_middle');
-          floors.create(2060, 980, 'floor_small').flipX = true;
-          floors.create(2060, 940, 'floor_diag').flipX = true;
-
-          floors.create(2100, 400, 'floor_bigvertical').flipX = true;
-          floors.create(2100, 780, 'floor_side_small').flipX = true;
-          floors.create(2100, 860, 'floor_vertical8').flipX = true;
-          floors.create(2100, 940, 'floor_small').flipX = true;
-      for (var i = 0; i < 2; i++) {
-          floors.create(2100, 980 + i * 40, 'floor_middle');
-      }
-          var floorflip14 = floors.create(2100, 1060, 'floor_small');
-          floorflip14.flipX = true;
-          floorflip14.flipY = true;
-          floors.create(2100, 1120, 'floor_vertical7').flipX = true;
-          floors.create(2100, 1180, 'floor_small').flipX = true;
-      for (var i = 0; i < 2; i++) {
-          floors.create(660 + i * 40, 1180, 'floor_middle');
-      }
-      for (var i = 0; i < 3; i++) {
-          floors.create(780 + i * 40, 1180, 'floor_front');
-          floors.create(1260 + i * 40, 1180, 'floor_front');
-
-      }
-      for (var i = 0; i < 5; i++) {
-          floors.create(60 + i * 40, 1180, 'floor_front');
-          floors.create(1900 + i * 40, 1180, 'floor_front');
-      }
-      for (var i = 0; i < 6; i++) {
-          floors.create(380 + i * 40, 1180, 'floor_front');
-          floors.create(1540 + i * 40, 1180, 'floor_front');
-      }
       //bullets
           bullets = this.physics.add.group()
             bullet1 = bullets.create( 30, 30, 'bullet1').setDepth(11);
@@ -963,6 +981,19 @@ this.anims.create({
     key_R.on('down', function () {
       if (Health == 0) {
         Health = 100
+        var randomLocation = Phaser.Math.Between(0, 100);
+        if (randomLocation <= 25) {
+          character.setPosition(80, 1140);
+        }
+        else if (randomLocation > 25 && randomLocation <= 50) {
+          character.setPosition(2000, 1140);
+        }
+        else if (randomLocation > 50 && randomLocation <= 75) {
+          character.setPosition(600, 300);
+        }
+        else {
+          character.setPosition(1500, 300);
+        }
         character.setActive(true);
         character.setVisible(true);
         gun.setVisible(true);
@@ -1022,7 +1053,6 @@ this.anims.create({
           }
        }
     })
-          healthtext = this.add.text( 1000, 500,"Health = " + Health).setScrollFactor(0).setDepth(3);
 	}
   update(){
     if (this.input.activePointer.isDown) {
@@ -1044,8 +1074,8 @@ this.anims.create({
     bulletcooldown -= 1
 //character
     if (spawned) {
-      name.x = character.x;
-      name.y = character.y - 35;
+      healthtext.setPosition(character.x, character.y + 25);
+      name.setPosition(character.x, character.y - 35);
       if (Health <= 0) {
         CanMove = false;
         healthtext.text = ("Press R to respawn")
@@ -1056,7 +1086,7 @@ this.anims.create({
         socket.emit('dead')
       }
       else {
-        healthtext.text = ("Health = " + Health)
+        healthtext.text = (Health)
       }
       if (this.input.activePointer.distance == 0) {
       }

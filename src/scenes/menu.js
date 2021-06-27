@@ -5,6 +5,7 @@ export default class menu extends Phaser.Scene {
   preload(){
   }
   create(){
+    var self = this;
     var savefile = JSON.parse(localStorage.getItem('saveFile'));
     var name = this.add.text(100, 100, 'Welcome back, ' + savefile.name, { font: '40px Courier', fill: '#000000' });
     var multiplayer = this.add.image(2120 / 2, 600.0, "multiplayer").setScale(3.0, 3.0);
@@ -17,9 +18,10 @@ export default class menu extends Phaser.Scene {
      this.scene.start('logo');
    }, this);
     play.setInteractive();
-    play.once('pointerup', function () {
-      this.scene.start('testlevel');
-    }, this);
+    play.on('pointerup', function () {
+      this.setFrame(0);
+      self.scene.start('testlevel');
+    });
     play.on('pointerdown', function () {
       this.setFrame(2);
     })
@@ -30,9 +32,10 @@ export default class menu extends Phaser.Scene {
       this.setFrame(0);
     })
     multiplayer.setInteractive();
-    multiplayer.once('pointerup', function () {
-      this.scene.start('multilevel');
-    }, this);
+    multiplayer.on('pointerup', function () {
+      this.setFrame(0);
+      self.scene.start('enterip');
+    });
     multiplayer.on('pointerdown', function () {
       this.setFrame(2);
     })
@@ -43,6 +46,9 @@ export default class menu extends Phaser.Scene {
       this.setFrame(0);
     })
     options.setInteractive();
+    options.on('pointerup', function () {
+      this.setFrame(0);
+    })
     options.on('pointerdown', function () {
       this.setFrame(2);
     })
@@ -53,9 +59,10 @@ export default class menu extends Phaser.Scene {
       this.setFrame(0);
     })
     quit.setInteractive();
-    quit.once('pointerup', function () {
+    quit.on('pointerup', function () {
+      this.setFrame(0);
       close();
-    }, this);
+    });
     quit.on('pointerdown', function () {
       this.setFrame(2);
     })
