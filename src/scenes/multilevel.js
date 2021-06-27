@@ -58,7 +58,6 @@ export default class multilevel extends Phaser.Scene {
   reconnection: false,
   reconnectionDelayMax: 10000,
 });
-
     this.otherPlayers = this.physics.add.group();
     this.otherGuns = this.physics.add.group();
     this.otherbullets = this.physics.add.group();
@@ -71,8 +70,8 @@ export default class multilevel extends Phaser.Scene {
       myid = playerInfo.playerId;
       var camera = self.cameras.main;
       camera.setZoom(2.5)
-      camera.setBounds(0, 0, 2120, 1200)
       camera.startFollow(character);
+      camera.setBackgroundColor('#646464');
       character.anims.play('dash')
       gun = self.add.image(character.x, character.y, 'gun1').setDepth(21);
       character.body.collideWorldBounds = true;
@@ -218,12 +217,11 @@ export default class multilevel extends Phaser.Scene {
       console.log('Connected to ' + address);
       socket.emit('data', savefile.name)
     });
-    var ping = self.add.text( 1390, 375, 'ping: ', { font: '20px Corbel', fill: '#000000' }).setScrollFactor(0).setDepth(30);
+    var ping = self.add.text( 1340, 375, 'ping: ', { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
     setInterval(() => {
   const start = Date.now();
   socket.volatile.emit("ping", () => {
     const latency = Date.now() - start;
-    console.log(latency);
     ping.text = 'ping: ' + latency;
   });
 }, 5000);
@@ -1102,10 +1100,16 @@ this.anims.create({
       else {
         healthtext.text = (Health)
       }
-      if (this.input.activePointer.distance == 0) {
+      var pointx = this.input.activePointer.worldX;
+      var pointy = this.input.activePointer.worldY;
+      if (this.input.activePointer.oldPosition && (pointx !== this.input.activePointer.oldPosition.pointx || pointy !== this.input.activePointer.oldPosition.pointy)) {
+        gun.rotation = Phaser.Math.Angle.Between(gun.x, gun.y, this.input.activePointer.worldX , this.input.activePointer.worldY);
       }
       else {
-        gun.rotation = Phaser.Math.Angle.Between(gun.x, gun.y, this.input.activePointer.worldX , this.input.activePointer.worldY);
+      }
+      this.input.activePointer.oldPosition = {
+        pointx: this.input.activePointer.worldX,
+        pointy: this.input.activePointer.worldY,
       }
         gun.x = character.x;
         gun.y = character.y + 10;
