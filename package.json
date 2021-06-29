@@ -19,25 +19,23 @@
   },
   "homepage": "https://github.com/BossIan/Ballshock#readme",
   "devDependencies": {
-    "@babel/core": "^7.14.2",
-    "@babel/preset-env": "^7.14.2",
+    "@babel/core": "^7.14.6",
+    "@babel/preset-env": "^7.14.7",
     "babel-loader": "^8.2.2",
     "copy-webpack-plugin": "^8.1.1",
-    "css-loader": "^5.2.4",
+    "css-loader": "^5.2.6",
     "html-loader": "^2.1.2",
-    "html-webpack-plugin": "^5.3.1",
-    "mini-css-extract-plugin": "^1.6.0",
-    "webpack": "^5.37.0",
-    "webpack-cli": "^4.7.0",
+    "html-webpack-plugin": "^5.3.2",
+    "mini-css-extract-plugin": "^1.6.1",
+    "webpack": "^5.40.0",
+    "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "jquery": "^3.6.0",
-    "phaser": "^3.54.0",
-    "socket.io": "^4.1.1",
-    "socket.io-client": "^4.1.1",
-    "socket.io-redis": "^6.1.0"
+    "phaser": "^3.55.2",
+    "socket.io": "^4.1.2",
+    "socket.io-client": "^4.1.2",
+    "socket.io-redis": "^6.1.1"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.3",
