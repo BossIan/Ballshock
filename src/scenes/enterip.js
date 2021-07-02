@@ -23,7 +23,7 @@ export default class enterip extends Phaser.Scene {
             }
           }
           else if (event.keyCode === 13 && ip.text.length > 0) {
-            address = ip.text;
+            address = ip.text + ':8081';
             self.scene.start('multilevel');
           }
           else if (event.keyCode === 13 && ip.text.length == 0) {

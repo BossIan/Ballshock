@@ -1,4 +1,3 @@
-import menu from './menu'
 export default class logo extends Phaser.Scene {
   constructor(){
     super({key: "logo"});
@@ -9,16 +8,23 @@ export default class logo extends Phaser.Scene {
   this.load.spritesheet('character1', 'character1.png', {frameWidth: 35, frameHeight: 35})
   this.load.spritesheet('walljump1', 'walljump1.png', {frameWidth: 35, frameHeight: 35})
   this.load.image('gun1', 'gun1.png')
-  this.load.image('bullet1', 'bullet1.png')
+  this.load.image('gun1Bullet', 'gun1Bullet.png')
+  this.load.image('AncientDischargeGun', 'AncientDischargeGun.png')
+  this.load.image('AncientDischargeGunBullet', 'AncientDischargeBullet.png')
+  this.load.image('128rectangle', '128rectangle.png')
+  this.load.image('250rectangle', '250rectangle.png')
   this.load.spritesheet('multiplayer', 'multiplayer.png', {frameWidth: 128, frameHeight: 64});
   this.load.spritesheet('play', 'play.png', {frameWidth: 128, frameHeight: 64});
   this.load.spritesheet('quit', 'quit.png', {frameWidth: 128, frameHeight: 64});
   this.load.spritesheet('options', 'options.png', {frameWidth: 128, frameHeight: 64});
+  this.load.spritesheet('button1', 'button1.png', {frameWidth: 128, frameHeight: 128});
+  this.load.spritesheet('button2', 'button2.png', {frameWidth: 128, frameHeight: 128});
+  this.load.spritesheet('button3', 'button3.png', {frameWidth: 128, frameHeight: 128});
 }
 	create(){
     var self = this;
     var name;
-    var file = JSON.parse(localStorage.getItem('saveFile'));
+    var file = JSON.parse(localStorage.getItem('name'));
     if (file == null) {
       console.log(file);
       this.add.text(100, 100, 'Enter your name:', { font: '40px Courier', fill: '#000000' });
@@ -32,8 +38,9 @@ export default class logo extends Phaser.Scene {
               }
             }
             else if (event.keyCode === 13 && name.text.length > 0) {
-              file = {name: name.text}
-              localStorage.setItem('saveFile',JSON.stringify(file));
+              file = name.text
+              console.log(JSON.stringify(file));
+              localStorage.setItem('name',JSON.stringify(file));
               self.scene.start('menu');
             }
           });

@@ -6,15 +6,20 @@ export default class menu extends Phaser.Scene {
   }
   create(){
     var self = this;
-    var savefile = JSON.parse(localStorage.getItem('saveFile'));
-    var name = this.add.text(100, 100, 'Welcome back, ' + savefile.name, { font: '40px Courier', fill: '#000000' });
-    var multiplayer = this.add.image(2120 / 2, 600.0, "multiplayer").setScale(3.0, 3.0);
+    var savedname = JSON.parse(localStorage.getItem('name'));
+    var name = this.add.text(100, 100, 'Welcome back, ' + savedname, { font: '40px Courier', fill: '#000000' });
+    var loadout = this.add.text(100, 1000, 'Loadout', { font: '80px Courier', fill: '#000000' });
+    var multiplayer = this.add.image(2120 / 2, 400.0, "multiplayer").setScale(3.0, 3.0);
 		var quit = this.add.image(2120 / 2, 1000, "quit").setScale(3.0, 3.0);
-		var play = this.add.image(2120 / 2, 400.0, "play").setScale(3.0, 3.0);
+		var play = this.add.image(2120 / 2, 600.0, "play").setScale(3.0, 3.0);
 		var options = this.add.image(2120 / 2, 800.0, "options").setScale(3.0, 3.0);
+    loadout.setInteractive();
+    loadout.on('pointerup', function () {
+     this.scene.start('loadout');
+   }, this);
     name.setInteractive();
     name.on('pointerup', function () {
-     localStorage.removeItem('saveFile');
+      localStorage.removeItem('name');
      this.scene.start('logo');
    }, this);
     play.setInteractive();
