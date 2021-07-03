@@ -28,6 +28,7 @@ export default class enterip extends Phaser.Scene {
           }
           else if (event.keyCode === 13 && ip.text.length == 0) {
             address = 'ballshock-server.herokuapp.com';
+            address = '192.168.0.21:8081';
             self.scene.start('multilevel');
           }
         });

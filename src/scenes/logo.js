@@ -5,14 +5,18 @@ export default class logo extends Phaser.Scene {
 	preload(){
 	this.add.image( 2120 / 2, 1200 / 2 - 75, 'logo');
   this.load.setPath('assets/');
-  this.load.spritesheet('character1', 'character1.png', {frameWidth: 35, frameHeight: 35})
-  this.load.spritesheet('walljump1', 'walljump1.png', {frameWidth: 35, frameHeight: 35})
+  this.load.spritesheet('Char1', 'Char1.png', {frameWidth: 35, frameHeight: 35})
+  this.load.spritesheet('Char1Walljump', 'Char1Walljump.png', {frameWidth: 35, frameHeight: 35})
   this.load.image('gun1', 'gun1.png')
   this.load.image('gun1Bullet', 'gun1Bullet.png')
   this.load.image('AncientDischargeGun', 'AncientDischargeGun.png')
   this.load.image('AncientDischargeGunBullet', 'AncientDischargeBullet.png')
   this.load.image('128rectangle', '128rectangle.png')
   this.load.image('250rectangle', '250rectangle.png')
+  this.load.image('hpbar', 'hpbar.png')
+  this.load.image('otherhpbar', 'otherhpbar.png')
+  this.load.image('Char1Afterimage', 'Char1Afterimage.png')
+  this.load.image('backbutton', 'backbutton.png')
   this.load.spritesheet('multiplayer', 'multiplayer.png', {frameWidth: 128, frameHeight: 64});
   this.load.spritesheet('play', 'play.png', {frameWidth: 128, frameHeight: 64});
   this.load.spritesheet('quit', 'quit.png', {frameWidth: 128, frameHeight: 64});
