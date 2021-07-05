@@ -1,5 +1,6 @@
 var gunpreview;
-var gunprev2;
+var primarypreview;
+var secondarypreview;
 var gunY = 0;
 export default class loadout extends Phaser.Scene {
   constructor(){
@@ -18,116 +19,93 @@ export default class loadout extends Phaser.Scene {
     var savedloadout1 = JSON.parse(localStorage.getItem('loadout1'));
     var savedloadout2 = JSON.parse(localStorage.getItem('loadout2'));
     var savedloadout3 = JSON.parse(localStorage.getItem('loadout3'));
-    var selectedloadout = savedloadout1;
     if (savedloadout1 == null) {
-      savedloadout1 = {gun: 'gun1',character: 'Char1', secondary: '', }
-      savedloadout2 = {gun: 'AncientDischargeGun',character: 'Char1', secondary: '', }
-      savedloadout3 = {gun: 'gun1',character: 'Char1', secondary: '', }
+      savedloadout1 = {primary: 'gun1',character: 'Char1', secondary: 'SolFlairGun', }
+      savedloadout2 = {primary: 'AncientDischargeGun',character: 'Char1', secondary: 'SolFlairGun', }
+      savedloadout3 = {primary: 'gun1',character: 'Char1', secondary: 'SolFlairGun', }
       localStorage.setItem('loadout1',JSON.stringify(savedloadout1));
       localStorage.setItem('loadout2',JSON.stringify(savedloadout2));
       localStorage.setItem('loadout3',JSON.stringify(savedloadout3));
     }
-    //preview screen
+    var selectedloadout = savedloadout1;
+//preview screen
     var characterpreview = this.add.image(484, 512, selectedloadout.character, 0).setDepth(2).setScale(20, 20)
     var characterselect = this.add.image(1545, 840, selectedloadout.character, 0).setDepth(2).setScale(10, 10)
-    gunpreview = this.add.image(484, 712, selectedloadout.gun).setDepth(2).setScale(20, 20)
-    var gunselect = this.add.image(1240, 280, selectedloadout.gun).setDepth(2).setScale(10, 10)
-    //select gun screen
+    gunpreview = this.add.image(484, 712, selectedloadout.primary).setDepth(2).setScale(20, 20)
+    var primaryselect = this.add.image(1240, 280, selectedloadout.primary).setDepth(2).setScale(10, 10)
+    var secondaryselect = this.add.image(1832, 280, selectedloadout.secondary).setDepth(2).setScale(10, 10)
+    //number rectangles
+    var rect1 = this.add.image(228, 1024, 'button1', 1).setInteractive().setOrigin(0.5, 0);
+    var rect2 = this.add.image(484, 1024, 'button2', 0).setInteractive().setOrigin(0.5, 0);
+    var rect3 = this.add.image(740, 1024, 'button3', 0).setInteractive().setOrigin(0.5, 0);
+
+//select primary screen
+    var primaryrect = this.add.image(968, 272, '128rectangle').setScale(4.5, 4.5).setOrigin(0, 0.5).setInteractive();
+    var Primarytext = this.add.text(1256, 440, "Primary", {}).setScale(4.5, 4.5).setOrigin(0.5, 0).setStyle({"color":"#060606ff"});
+    var characterprimarypreview = this.add.image(1060, 450, selectedloadout.character, 0).setScale(20, 20).setVisible(false)
+		primarypreview = this.add.image(1060, 650, selectedloadout.primary).setScale(20, 20).setVisible(false)
+    //select primary screen rectangles
+		var gun1rect = this.add.image(0, 1200, '250rectangle').setScale(2, 2).setOrigin(0, 1).setInteractive().setVisible(false);
+    var ancientDischargeGunrect = this.add.image(500, 1200, '250rectangle').setScale(2, 2).setOrigin(0, 1).setInteractive().setVisible(false);
+    //primary guns
     var gun1 = this.add.image(250, 1050, "gun1").setScale(10, 10).setVisible(false).setDepth(2)
     var ancientDischargeGun = this.add.image(750, 1050, "AncientDischargeGun").setScale(10, 10).setVisible(false).setDepth(2)
-    var characterprev2 = this.add.image(1060, 450, selectedloadout.character, 0).setScale(20, 20).setVisible(false)
-		gunprev2 = this.add.image(1060, 650, selectedloadout.gun).setScale(20, 20).setVisible(false)
 
-    //select rectangles
-		var secondaryrect = this.add.image(1832, 280, '128rectangle').setScale(4.5, 4.5)
-		var primaryrect = this.add.image(968, 272, '128rectangle').setScale(4.5, 4.5).setOrigin(0, 0.5).setInteractive();
-		var characterrect = this.add.image(1544, 880, '128rectangle').setScale(9, 5)
+//select secondary screen rectangles
+    var secondaryrect = this.add.image(1832, 280, '128rectangle').setScale(4.5, 4.5).setInteractive();
+    var Secondarytext = this.add.text(1832, 440, "Secondary", {}).setScale(4.5, 4.5).setOrigin(0.5, 0).setStyle({"color":"#000000ff"});
+    var charactersecondarypreview = this.add.image(1060, 450, selectedloadout.character, 0).setScale(20, 20).setVisible(false)
+		secondarypreview = this.add.image(1060, 650, selectedloadout.secondary).setScale(20, 20).setVisible(false)
+    //select primary screen rectangles
+    var SolFlairGun1rect = this.add.image(0, 1200, '250rectangle').setScale(2, 2).setOrigin(0, 1).setInteractive().setVisible(false);
+    //secondary guns
+    var SolFlairGun = this.add.image(250, 1050, "SolFlairGun").setScale(10, 10).setVisible(false).setDepth(2)
 
-    //select gun screen rectangles
-		var gun1rect = this.add.image(0, 1200, '250rectangle').setScale(2, 2).setOrigin(0, 1).setInteractive().setVisible(false);
-    var gun2rect = this.add.image(500, 1200, '250rectangle').setScale(2, 2).setOrigin(0, 1).setInteractive().setVisible(false);
+		//texts
+    var characterrect = this.add.image(1544, 880, '128rectangle').setScale(9, 5)
+    var Charactertext = this.add.text(1544, 1040, "Character", {}).setScale(9, 9).setOrigin(0.5, 0).setStyle({"color":"#050101ff","stroke":"#de7e7eff"});
 
-    //number rectangles
-		var rect1 = this.add.image(228, 1024, 'button1', 1).setInteractive().setOrigin(0.5, 0);
     rect1.on('pointerup', function () {
       rect1.setFrame(1);
       rect2.setFrame(0);
       rect3.setFrame(0);
       selectedloadout = savedloadout1;
-      characterpreview.setTexture(savedloadout1.character)
-      characterselect.setTexture(savedloadout1.character)
-      gunpreview.setTexture(savedloadout1.gun)
-      gunselect.setTexture(savedloadout1.gun)
-   });
-		var rect2 = this.add.image(484, 1024, 'button2', 0).setInteractive().setOrigin(0.5, 0);
+      settextureloadout()
+    });
     rect2.on('pointerup', function () {
       rect1.setFrame(0);
       rect2.setFrame(1);
       rect3.setFrame(0);
       selectedloadout = savedloadout2;
-      characterpreview.setTexture(savedloadout2.character)
-      characterselect.setTexture(savedloadout2.character)
-      gunpreview.setTexture(savedloadout2.gun)
-      gunselect.setTexture(savedloadout2.gun)
-   });
-		var rect3 = this.add.image(740, 1024, 'button3', 0).setInteractive().setOrigin(0.5, 0);
+      settextureloadout()
+    });
     rect3.on('pointerup', function () {
       rect1.setFrame(0);
       rect2.setFrame(0);
       rect3.setFrame(1);
       selectedloadout = savedloadout3;
-      characterpreview.setTexture(savedloadout3.character)
-      characterselect.setTexture(savedloadout3.character)
-      gunpreview.setTexture(savedloadout3.gun)
-      gunselect.setTexture(savedloadout3.gun)
+      settextureloadout()
    });
-		//texts
-    var Charactertext = this.add.text(1544, 1040, "Character", {}).setScale(9, 9).setOrigin(0.5, 0).setStyle({"color":"#050101ff","stroke":"#de7e7eff"});
-    var Primarytext = this.add.text(1256, 440, "Primary", {}).setScale(4.5, 4.5).setOrigin(0.5, 0).setStyle({"color":"#060606ff"});
-    var Secondarytext = this.add.text(1832, 440, "Secondary", {}).setScale(4.5, 4.5).setOrigin(0.5, 0).setStyle({"color":"#000000ff"});
+    //primary
     primaryrect.on('pointerup', function () {
-      characterpreview.setVisible(false)
-      characterselect.setVisible(false)
-      gunpreview.setVisible(false)
-      gunselect.setVisible(false)
-      secondaryrect.setVisible(false)
-      primaryrect.setVisible(false)
-      characterrect.setVisible(false)
-      rect1.setVisible(false)
-      rect2.setVisible(false)
-      rect3.setVisible(false)
-      Charactertext.setVisible(false)
-      Primarytext.setVisible(false)
-      Secondarytext.setVisible(false)
+      setpreviewscreen(false)
       gun1.setVisible(true)
       ancientDischargeGun.setVisible(true)
-      characterprev2.setVisible(true)
-      gunprev2.setVisible(true)
+      characterprimarypreview.setVisible(true)
+      primarypreview.setVisible(true)
       gun1rect.setVisible(true)
-      gun2rect.setVisible(true)
-      gunprev2.setTexture(selectedloadout.gun)
+      ancientDischargeGunrect.setVisible(true)
+      primarypreview.setTexture(selectedloadout.primary)
     })
     gun1rect.on('pointerup', function () {
-      characterpreview.setVisible(true)
-      characterselect.setVisible(true)
-      gunpreview.setVisible(true)
-      gunselect.setVisible(true)
-      secondaryrect.setVisible(true)
-      primaryrect.setVisible(true)
-      characterrect.setVisible(true)
-      rect1.setVisible(true)
-      rect2.setVisible(true)
-      rect3.setVisible(true)
-      Charactertext.setVisible(true)
-      Primarytext.setVisible(true)
-      Secondarytext.setVisible(true)
+      setpreviewscreen(true)
       gun1.setVisible(false)
       ancientDischargeGun.setVisible(false)
-      characterprev2.setVisible(false)
-      gunprev2.setVisible(false)
+      characterprimarypreview.setVisible(false)
+      primarypreview.setVisible(false)
       gun1rect.setVisible(false)
-      gun2rect.setVisible(false)
-      selectedloadout.gun = 'gun1';
+      ancientDischargeGunrect.setVisible(false)
+      selectedloadout.primary = 'gun1';
       if (selectedloadout == savedloadout1) {
         localStorage.setItem('loadout1',JSON.stringify(selectedloadout));
       }
@@ -137,30 +115,18 @@ export default class loadout extends Phaser.Scene {
       else {
         localStorage.setItem('loadout3',JSON.stringify(selectedloadout));
       }
-      gunpreview.setTexture(selectedloadout.gun)
-      gunselect.setTexture(selectedloadout.gun)
+      gunpreview.setTexture(selectedloadout.primary)
+      primaryselect.setTexture(selectedloadout.primary)
     })
-    gun2rect.on('pointerup', function () {
-      characterpreview.setVisible(true)
-      characterselect.setVisible(true)
-      gunpreview.setVisible(true)
-      gunselect.setVisible(true)
-      secondaryrect.setVisible(true)
-      primaryrect.setVisible(true)
-      characterrect.setVisible(true)
-      rect1.setVisible(true)
-      rect2.setVisible(true)
-      rect3.setVisible(true)
-      Charactertext.setVisible(true)
-      Primarytext.setVisible(true)
-      Secondarytext.setVisible(true)
-      gun1.setVisible(false)
-      ancientDischargeGun.setVisible(false)
-      characterprev2.setVisible(false)
-      gunprev2.setVisible(false)
+    ancientDischargeGunrect.on('pointerup', function () {
+      setpreviewscreen(true)
+      characterprimarypreview.setVisible(false)
+      primarypreview.setVisible(false)
       gun1rect.setVisible(false)
-      gun2rect.setVisible(false)
-      selectedloadout.gun = 'AncientDischargeGun';
+      gun1.setVisible(false)
+      ancientDischargeGunrect.setVisible(false)
+      ancientDischargeGun.setVisible(false)
+      selectedloadout.primary = 'AncientDischargeGun';
       if (selectedloadout == savedloadout1) {
         localStorage.setItem('loadout1',JSON.stringify(selectedloadout));
       }
@@ -170,9 +136,59 @@ export default class loadout extends Phaser.Scene {
       else {
         localStorage.setItem('loadout3',JSON.stringify(selectedloadout));
       }
-      gunpreview.setTexture(selectedloadout.gun)
-      gunselect.setTexture(selectedloadout.gun)
+      gunpreview.setTexture(selectedloadout.primary)
+      primaryselect.setTexture(selectedloadout.primary)
     })
+    //secondary
+    secondaryrect.on('pointerup', function () {
+      setpreviewscreen(false)
+      charactersecondarypreview.setVisible(true)
+      secondarypreview.setVisible(true)
+      SolFlairGun1rect.setVisible(true)
+      SolFlairGun.setVisible(true)
+      secondarypreview.setTexture(selectedloadout.secondary)
+    })
+    SolFlairGun1rect.on('pointerup', function () {
+      setpreviewscreen(true)
+      charactersecondarypreview.setVisible(false)
+      secondarypreview.setVisible(false)
+      SolFlairGun1rect.setVisible(false)
+      SolFlairGun.setVisible(false)
+      selectedloadout.secondary = 'SolFlairGun';
+      if (selectedloadout == savedloadout1) {
+        localStorage.setItem('loadout1',JSON.stringify(selectedloadout));
+      }
+      else if (selectedloadout == savedloadout2) {
+        localStorage.setItem('loadout2',JSON.stringify(selectedloadout));
+      }
+      else {
+        localStorage.setItem('loadout3',JSON.stringify(selectedloadout));
+      }
+      secondaryselect.setTexture(selectedloadout.secondary)
+    })
+    function settextureloadout() {
+      characterpreview.setTexture(selectedloadout.character)
+      characterselect.setTexture(selectedloadout.character)
+      gunpreview.setTexture(selectedloadout.primary)
+      primaryselect.setTexture(selectedloadout.primary)
+      secondaryselect.setTexture(selectedloadout.secondary)
+    }
+    function setpreviewscreen(boolean) {
+      characterpreview.setVisible(boolean)
+      characterselect.setVisible(boolean)
+      gunpreview.setVisible(boolean)
+      primaryselect.setVisible(boolean)
+      secondaryselect.setVisible(boolean)
+      secondaryrect.setVisible(boolean)
+      primaryrect.setVisible(boolean)
+      characterrect.setVisible(boolean)
+      rect1.setVisible(boolean)
+      rect2.setVisible(boolean)
+      rect3.setVisible(boolean)
+      Charactertext.setVisible(boolean)
+      Primarytext.setVisible(boolean)
+      Secondarytext.setVisible(boolean)
+    }
   }
   update(){
     if (gunY >= 12) {
@@ -188,6 +204,7 @@ export default class loadout extends Phaser.Scene {
       gunY += 0.5
     }
     gunpreview.y = gunY + 700
-    gunprev2.y = gunY + 650
+    primarypreview.y = gunY + 650
+    secondarypreview.y = gunY + 650
   }
 }

@@ -6,13 +6,19 @@ export default class enterip extends Phaser.Scene {
   }
   create(){
     var self = this;
+    address = JSON.parse(localStorage.getItem('address'));
     var key_ESC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     key_ESC.on('up', function () {
       this.scene.start('menu')
     },this)
     this.add.text(100, 100, 'Enter ip:', { font: '40px Courier', fill: '#000000' });
     this.add.text(100, 200, 'Press Enter without ip to join the official server.', { font: '40px Courier', fill: '#000000' });
-    ip = this.add.text(100, 150, '', { font: '40px Courier', fill: '#000000' });
+    if (address !== null) {
+        ip = this.add.text(100, 150, address, { font: '40px Courier', fill: '#000000' });
+    }
+    else {
+      ip = this.add.text(100, 150, '', { font: '40px Courier', fill: '#000000' });
+    }
     this.input.keyboard.on('keydown', function (event) {
         if (event.keyCode === 8 && ip.text.length > 0){
           ip.text = ip.text.substr(0, ip.text.length - 1);
@@ -23,6 +29,7 @@ export default class enterip extends Phaser.Scene {
             }
           }
           else if (event.keyCode === 13 && ip.text.length > 0) {
+            localStorage.setItem('address',JSON.stringify(ip.text));
             address = ip.text + ':8081';
             self.scene.start('multilevel');
           }

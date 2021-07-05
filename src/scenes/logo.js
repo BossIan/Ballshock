@@ -11,6 +11,8 @@ export default class logo extends Phaser.Scene {
   this.load.image('gun1Bullet', 'gun1Bullet.png')
   this.load.image('AncientDischargeGun', 'AncientDischargeGun.png')
   this.load.image('AncientDischargeGunBullet', 'AncientDischargeBullet.png')
+  this.load.image('SolFlairGun', 'SolFlairGun.png')
+  this.load.image('SolFlairGunBullet', 'SolFlairGunBullet.png')
   this.load.image('128rectangle', '128rectangle.png')
   this.load.image('250rectangle', '250rectangle.png')
   this.load.image('hpbar', 'hpbar.png')
