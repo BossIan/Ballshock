@@ -30,6 +30,17 @@ export default class logo extends Phaser.Scene {
 	create(){
     var self = this;
     var name;
+    var savedloadout1 = JSON.parse(localStorage.getItem('loadout1'));
+    var savedloadout2 = JSON.parse(localStorage.getItem('loadout2'));
+    var savedloadout3 = JSON.parse(localStorage.getItem('loadout3'));
+    if (savedloadout1 == null) {
+      savedloadout1 = {primary: 'gun1',character: 'Char1', secondary: 'SolFlairGun', }
+      savedloadout2 = {primary: 'AncientDischargeGun',character: 'Char1', secondary: 'SolFlairGun', }
+      savedloadout3 = {primary: 'gun1',character: 'Char1', secondary: 'SolFlairGun', }
+      localStorage.setItem('loadout1',JSON.stringify(savedloadout1));
+      localStorage.setItem('loadout2',JSON.stringify(savedloadout2));
+      localStorage.setItem('loadout3',JSON.stringify(savedloadout3));
+    }
     var file = JSON.parse(localStorage.getItem('name'));
     if (file == null) {
       console.log(file);
