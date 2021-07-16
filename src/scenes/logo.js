@@ -11,14 +11,20 @@ export default class logo extends Phaser.Scene {
   this.load.image('gun1Bullet', 'gun1Bullet.png')
   this.load.image('AncientDischargeGun', 'AncientDischargeGun.png')
   this.load.image('AncientDischargeGunBullet', 'AncientDischargeBullet.png')
+  this.load.image('ThunderScreamGun', 'thunderscreamGun.png')
+  this.load.image('ThunderScreamGunBullet', 'thunderscreamBullet.png')
   this.load.image('SolFlairGun', 'SolFlairGun.png')
   this.load.image('SolFlairGunBullet', 'SolFlairGunBullet.png')
   this.load.image('128rectangle', '128rectangle.png')
   this.load.image('250rectangle', '250rectangle.png')
   this.load.image('hpbar', 'hpbar.png')
   this.load.image('otherhpbar', 'otherhpbar.png')
+  this.load.image('overheatbar', 'overheatbar.png')
   this.load.image('Char1Afterimage', 'Char1Afterimage.png')
   this.load.image('backbutton', 'backbutton.png')
+  this.load.image('healthpack', 'healthpack.png')
+  this.load.spritesheet('overheattext', 'overheattext.png', {frameWidth: 49, frameHeight: 25})
+  this.load.spritesheet('healthstation', 'healthstation.png', {frameWidth: 40, frameHeight: 40})
   this.load.spritesheet('multiplayer', 'multiplayer.png', {frameWidth: 128, frameHeight: 64});
   this.load.spritesheet('play', 'play.png', {frameWidth: 128, frameHeight: 64});
   this.load.spritesheet('quit', 'quit.png', {frameWidth: 128, frameHeight: 64});
@@ -36,7 +42,7 @@ export default class logo extends Phaser.Scene {
     if (savedloadout1 == null) {
       savedloadout1 = {primary: 'gun1',character: 'Char1', secondary: 'SolFlairGun', }
       savedloadout2 = {primary: 'AncientDischargeGun',character: 'Char1', secondary: 'SolFlairGun', }
-      savedloadout3 = {primary: 'gun1',character: 'Char1', secondary: 'SolFlairGun', }
+      savedloadout3 = {primary: 'ThunderScreamGun',character: 'Char1', secondary: 'SolFlairGun', }
       localStorage.setItem('loadout1',JSON.stringify(savedloadout1));
       localStorage.setItem('loadout2',JSON.stringify(savedloadout2));
       localStorage.setItem('loadout3',JSON.stringify(savedloadout3));
