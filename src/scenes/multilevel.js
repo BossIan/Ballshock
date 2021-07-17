@@ -62,6 +62,7 @@ var selectedloadout;
 var afterimage;
 var connectingtext;
 var myid;
+var morekill = 0;
 export default class multilevel extends Phaser.Scene {
   constructor(){
     super({key: "multilevel"});
@@ -110,19 +111,19 @@ export default class multilevel extends Phaser.Scene {
     var savedloadout3 = JSON.parse(localStorage.getItem('loadout3'));
     selectedloadout = savedloadout1;
     //images
-    var characterselect = this.add.image(1060, 590, selectedloadout.character, 0).setScale(2.5, 2.5).setScrollFactor(0).setDepth(61);
-    var primaryselect = this.add.image(996, 455.6, selectedloadout.primary).setScale(2, 2).setScrollFactor(0).setDepth(61);
-    var secondaryselect = this.add.image(1124, 455.6, selectedloadout.secondary).setScale(2, 2).setScrollFactor(0).setDepth(61);
+    var characterselect = this.add.image(1060, 590, selectedloadout.character, 0).setScale(1.75, 1.75).setScrollFactor(0).setDepth(61);
+    var primaryselect = this.add.image(996, 455.6, selectedloadout.primary).setScale(1.75, 1.75).setScrollFactor(0).setDepth(61);
+    var secondaryselect = this.add.image(1124, 455.6, selectedloadout.secondary).setScale(1.75, 1.75).setScrollFactor(0).setDepth(61);
     //rectangles
-		var characterrect = this.add.image(1060, 590, '128rectangle').setScale(2 , 1.1).setScrollFactor(0).setDepth(59)
 		loadoutrect = this.add.rectangle(1060, 800, 500, 128).setScale(0.5 , 0.5).setInteractive().setScrollFactor(0).setDepth(59);
     loadoutrect.isFilled = true;
     loadoutrect.fillColor = 2630692;
     spawnrect = this.add.rectangle(1060, 725, 500, 128).setScale(0.5 , 0.5).setVisible(false).setInteractive().setScrollFactor(0).setDepth(59);
     spawnrect.isFilled = true;
     spawnrect.fillColor = 2630692;
+    var characterrect = this.add.image(1060, 590, '128rectangle').setScale(2 , 1.1).setScrollFactor(0).setDepth(59)
+    var primaryrect = this.add.image(1060, 455.6, '128rectangle').setOrigin(1, 0.5).setScrollFactor(0).setDepth(59)
 		var secondaryrect = this.add.image(1060, 455.6, '128rectangle').setOrigin(0, 0.5).setScrollFactor(0).setDepth(59);
-		var primaryrect = this.add.image(1060, 455.6, '128rectangle').setOrigin(1, 0.5).setScrollFactor(0).setDepth(59)
     var rect1 = this.add.image(967, 720, 'button1', 1).setScale(0.5, 0.5).setOrigin(0.5, 0.5).setInteractive().setScrollFactor(0).setDepth(59);
     var rect2 = this.add.image(1060, 720, 'button2', 0).setScale(0.5, 0.5).setOrigin(0.5, 0.5).setInteractive().setScrollFactor(0).setDepth(59);
     var rect3 = this.add.image(1153, 720, 'button3', 0).setScale(0.5, 0.5).setOrigin(0.5, 0.5).setInteractive().setScrollFactor(0).setDepth(59);
@@ -192,6 +193,7 @@ export default class multilevel extends Phaser.Scene {
       }
     }
     function addPlayer(self, playerInfo, availablenumber) {
+      morekill = 0;
       selectedgun = 'primary';
       self.character = self.physics.add.sprite(80, 1100, selectedloadout.character, 0).setDepth(35);
       afterimage = self.physics.add.image(self.character.x , self.character.y, selectedloadout.character + 'Afterimage').setDepth(33).setVisible(false)
@@ -287,10 +289,26 @@ export default class multilevel extends Phaser.Scene {
               }
               else if (otherbullet.texture.key == 'ThunderScreamGunBullet') {
                 Health -= ThunderScreamGundamage
-                console.log(ThunderScreamGundamage);
               }
               else if (otherbullet.texture.key == 'SolFlairGunBullet') {
                 Health -= SolFlairGundamage
+              }
+              if (Health <= 0) {
+                spawnrect.setVisible(true)
+                spawntext.setVisible(true)
+                loadoutrect.setVisible(true)
+                loadouttext.setVisible(true)
+                CanMove = false;
+                self.character.setVelocity(0, 0)
+                healthtext.setVisible(false);
+                self.character.setActive(false);
+                self.character.setVisible(false);
+                primarygun.setVisible(false);
+                name.setVisible(false);
+                socket.emit('dead', {killed: myid, killer: otherbullet.playerId})
+              }
+              else {
+                healthtext.setCrop(0, 0, Health / 100 * 100, 8)
               }
               otherbullet.setActive(false)
               otherbullet.setVisible(false)
@@ -311,6 +329,7 @@ export default class multilevel extends Phaser.Scene {
   })
   }
     function disconnect() {
+      socket.disconnect();
     var disconlayer = self.add.layer().setDepth(60);
     spawned = false;
     self.character.destroy();
@@ -383,7 +402,7 @@ export default class multilevel extends Phaser.Scene {
     });
     this.anims.create({
       key: 'healthstationidle',
-      repeat: -1,
+      repeat: 0,
       frameRate: 15,
       frames: this.anims.generateFrameNumbers('healthstation')
     });
@@ -463,7 +482,7 @@ export default class multilevel extends Phaser.Scene {
         var start = Date.now();
         socket.volatile.emit("ping", () => {
         var latency = Date.now() - start;
-        if (latency >= 500) {
+        if (latency >= 1000) {
           disconnect();
         }
         ping.text = 'ping: ' + latency;
@@ -503,7 +522,12 @@ export default class multilevel extends Phaser.Scene {
                      if (healthpack.active) {
                        healthpack.setVisible(false)
                        healthpack.setActive(false)
-                       Health += 30
+                       if (Health <= 100) {
+                         Health = 100
+                       }
+                       else {
+                         Health += 30
+                       }
                        socket.emit('healthpackGot', healthpack.name)
                        socket.emit('healthupdate', { hp: Health})
                      }
@@ -1224,13 +1248,15 @@ export default class multilevel extends Phaser.Scene {
       }
       });
        socket.on('healthpackUp', function (healthpackinfo) {
-         var o = 1
+         var o = 0
          for (var healthpacks in healthpackinfo) {
-           if (healthpackinfo.hasOwnProperty(healthpacks)) {
-             healthpack[o].setVisible(healthpackinfo[healthpacks])
-             healthpack[o].setActive(healthpackinfo[healthpacks])
-           }
            o += 1
+           if (healthpackinfo.hasOwnProperty(healthpacks)) {
+             healthstation[o].anims.play('healthstationidle')
+               healthpack[o].setVisible(healthpackinfo[healthpacks])
+               healthpack[o].setActive(healthpackinfo[healthpacks])
+
+           }
          }
         })
        socket.on('overheated', function (playerInfo) {
@@ -1246,12 +1272,46 @@ export default class multilevel extends Phaser.Scene {
             });
           }
          })
+       socket.on('KillBroadcast', function (kill) {
+            var killertextx = 1060;
+            var killedtextx = 1060;
+            var killY = 390;
+            if (kill.killer.playergun == 'gun1') {
+              killertextx -= 12.5 + 5
+              killedtextx += 12.5 + 5
+            }
+            else if (kill.killer.playergun == 'AncientDischargeGun') {
+              killertextx -= 23 + 5
+              killedtextx += 23 + 5
+            }
+            else if (kill.killer.playergun == 'ThunderScreamGun') {
+              killertextx -= 29.5 + 5
+              killedtextx += 29.5 + 5
+            }
+            else if (kill.killer.playergun == 'SolFlairGun') {
+              killertextx -= 8.5 + 5
+              killedtextx += 8.5 + 5
+            }
+            if (morekill > 0) {
+              killY += 20 * morekill
+            }
+            var killergun = self.add.image(1060, killY, kill.killer.playergun).setDepth(60).setScrollFactor(0)
+            var killertext = self.add.text(killertextx, killY, kill.killer.playername).setDepth(60).setScrollFactor(0).setOrigin(1, 0.5)
+            var killedtext = self.add.text(killedtextx, killY, kill.killed).setDepth(60).setScrollFactor(0).setOrigin(0, 0.5)
+            morekill += 1
+            setTimeout(function () {
+              killergun.destroy()
+              killertext.destroy()
+              killedtext.destroy()
+              morekill -= 1
+            }, 1500)
+        })
+
         spawnfirst = false;
      }
      else {
       if (Health <= 0) {
           gunconfig();
-          socket.emit('changeloadout', {character: selectedloadout.character, gun: primarygun.texture.key})
           loadoutselection.setVisible(false)
           rect1.setVisible(false)
           rect2.setVisible(false)
@@ -1271,6 +1331,7 @@ export default class multilevel extends Phaser.Scene {
             primarygun.setTexture(selectedloadout.secondary)
           }
           Health = 100
+          healthtext.setCrop(0, 0, Health / 100 * 100, 8)
           socket.emit('healthupdate', { hp: Health})
           CanMove = true;
           var randomLocation = Phaser.Math.Between(0, 100);
@@ -1286,6 +1347,7 @@ export default class multilevel extends Phaser.Scene {
           else {
             self.character.setPosition(1500, 300);
           }
+          socket.emit('changeloadout', {character: selectedloadout.character, gun: primarygun.texture.key})
           socket.emit('alive')
       }
     }
@@ -1310,13 +1372,14 @@ export default class multilevel extends Phaser.Scene {
     key_R.on('down', function () {
       if (Health <= 0) {
         gunconfig();
-        socket.emit('changeloadout', {character: selectedloadout.character, gun: primarygun.texture.key})
         loadoutselection.setVisible(false)
         rect1.setVisible(false)
         rect2.setVisible(false)
         rect3.setVisible(false)
         loadoutrect.setVisible(false)
         loadouttext.setVisible(false)
+        spawntext.setVisible(false)
+        spawnrect.setVisible(false)
         self.character.setActive(true);
         self.character.setVisible(true);
         primarygun.setVisible(true);
@@ -1330,6 +1393,7 @@ export default class multilevel extends Phaser.Scene {
         name.setVisible(true);
         healthtext.setVisible(true);
         Health = 100
+        healthtext.setCrop(0, 0, Health / 100 * 100, 8)
         socket.emit('healthupdate', { hp: Health})
         CanMove = true;
         var randomLocation = Phaser.Math.Between(0, 100);
@@ -1345,6 +1409,7 @@ export default class multilevel extends Phaser.Scene {
         else {
           self.character.setPosition(1500, 300);
         }
+        socket.emit('changeloadout', {character: selectedloadout.character, gun: primarygun.texture.key})
         socket.emit('alive')
       }
     })
@@ -1572,23 +1637,6 @@ export default class multilevel extends Phaser.Scene {
             }
           }
         }
-      if (Health <= 0) {
-        spawnrect.setVisible(true)
-        spawntext.setVisible(true)
-        loadoutrect.setVisible(true)
-        loadouttext.setVisible(true)
-        CanMove = false;
-        this.character.setVelocity(0, 0)
-        healthtext.setVisible(false);
-        this.character.setActive(false);
-        this.character.setVisible(false);
-        primarygun.setVisible(false);
-        name.setVisible(false);
-        socket.emit('dead')
-      }
-      else {
-        healthtext.setCrop(0, 0, Health / 100 * 100, 8)
-      }
 //pointer
       var pointx = this.input.activePointer.worldX;
       var pointy = this.input.activePointer.worldY;

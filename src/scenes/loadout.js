@@ -21,9 +21,9 @@ export default class loadout extends Phaser.Scene {
     var savedloadout3 = JSON.parse(localStorage.getItem('loadout3'));
     var selectedloadout = savedloadout1;
 //preview screen
-    var characterpreview = this.add.image(484, 512, selectedloadout.character, 0).setDepth(2).setScale(20, 20)
-    var characterselect = this.add.image(1545, 840, selectedloadout.character, 0).setDepth(2).setScale(10, 10)
-    gunpreview = this.add.image(484, 712, selectedloadout.primary).setDepth(2).setScale(20, 20)
+    var characterpreview = this.add.image(484, 512, selectedloadout.character, 0).setDepth(2).setScale(15, 15)
+    var characterselect = this.add.image(1545, 840, selectedloadout.character, 0).setDepth(2).setScale(7, 7)
+    gunpreview = this.add.image(484, 712, selectedloadout.primary).setDepth(2).setScale(15, 15)
     var primaryselect = this.add.image(1240, 280, selectedloadout.primary).setDepth(2).setScale(7, 7)
     var secondaryselect = this.add.image(1832, 280, selectedloadout.secondary).setDepth(2).setScale(7, 7)
 
@@ -34,31 +34,31 @@ export default class loadout extends Phaser.Scene {
 
 //select primary screen
     var primaryrect = this.add.image(968, 272, '128rectangle').setScale(4.5, 4.5).setOrigin(0, 0.5).setInteractive();
-    var Primarytext = this.add.text(1256, 440, "Primary", {}).setScale(4.5, 4.5).setOrigin(0.5, 0).setStyle({"color":"#060606ff"});
-    var characterprimarypreview = this.add.image(1060, 450, selectedloadout.character, 0).setScale(20, 20)
-		primarypreview = this.add.image(1060, 650, selectedloadout.primary).setScale(20, 20)
+    var Primarytext = this.add.text(1256, 440, "Primary", {}).setScale(4.5, 4.5).setOrigin(0.5, 0.5).setStyle({"color":"#060606ff"});
+    var characterprimarypreview = this.add.image(1060, 450, selectedloadout.character, 0).setScale(15, 15)
+		primarypreview = this.add.image(1060, 650, selectedloadout.primary).setScale(15, 15)
   //select primary screen rectangles
 		var gun1rect = this.add.image(0, 1200, '250rectangle').setScale(2, 2).setOrigin(0, 1).setInteractive().setVisible(false);
     var gun2rect = this.add.image(500, 1200, '250rectangle').setScale(2, 2).setOrigin(0, 1).setInteractive().setVisible(false);
     var gun3rect = this.add.image(1000, 1200, '250rectangle').setScale(2, 2).setOrigin(0, 1).setInteractive().setVisible(false);
   //primary guns
-    var gun1 = this.add.image(250, 1050, "gun1").setScale(7, 7).setDepth(2)
-    var ancientDischargeGun = this.add.image(750, 1050, "AncientDischargeGun").setScale(7, 7).setDepth(2)
-    var thunderscreamGun = this.add.image(1250, 1050, "ThunderScreamGun").setScale(7, 7).setDepth(2)
+    var gun1 = this.add.image(250, 1025, "gun1").setScale(7, 7).setDepth(2)
+    var ancientDischargeGun = this.add.image(750, 1025, "AncientDischargeGun").setScale(7, 7).setDepth(2)
+    var thunderscreamGun = this.add.image(1250, 1025, "ThunderScreamGun").setScale(7, 7).setDepth(2)
 
 //select secondary screen rectangles
     var secondaryrect = this.add.image(1832, 280, '128rectangle').setScale(4.5, 4.5).setInteractive();
-    var Secondarytext = this.add.text(1832, 440, "Secondary", {}).setScale(4.5, 4.5).setOrigin(0.5, 0).setStyle({"color":"#000000ff"});
-    var charactersecondarypreview = this.add.image(1060, 450, selectedloadout.character, 0).setScale(20, 20)
-		secondarypreview = this.add.image(1060, 650, selectedloadout.secondary).setScale(20, 20)
-  //select primary screen rectangles
+    var Secondarytext = this.add.text(1832, 440, "Secondary", {}).setScale(4.5, 4.5).setOrigin(0.5, 0.5).setStyle({"color":"#000000ff"});
+    var charactersecondarypreview = this.add.image(1060, 450, selectedloadout.character, 0).setScale(15, 15)
+		secondarypreview = this.add.image(1060, 650, selectedloadout.secondary).setScale(15, 15)
+  //select secondary screen rectangles
     var secondarygun1 = this.add.image(0, 1200, '250rectangle').setScale(2, 2).setOrigin(0, 1).setInteractive().setVisible(false);
   //secondary guns
-    var SolFlairGun = this.add.image(250, 1050, "SolFlairGun").setScale(7, 7).setDepth(2)
+    var SolFlairGun = this.add.image(250, 1025, "SolFlairGun").setScale(7, 7).setDepth(2)
 
 //texts
     var characterrect = this.add.image(1544, 880, '128rectangle').setScale(9, 5)
-    var Charactertext = this.add.text(1544, 1040, "Character", {}).setScale(9, 9).setOrigin(0.5, 0).setStyle({"color":"#050101ff","stroke":"#de7e7eff"});
+    var Charactertext = this.add.text(1544, 1040, "Character", {}).setScale(9, 9).setOrigin(0.5, 0.5).setStyle({"color":"#050101ff","stroke":"#de7e7eff"});
 
     var loadoutselectionlayer = this.add.layer()
     loadoutselectionlayer.add(characterrect)
