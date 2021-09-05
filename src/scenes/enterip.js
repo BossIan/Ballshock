@@ -31,11 +31,11 @@ export default class enterip extends Phaser.Scene {
           else if (event.keyCode === 13 && ip.text.length > 0) {
             localStorage.setItem('address',JSON.stringify(ip.text));
             address = ip.text + ':8081';
-            self.scene.start('multilevel');
+            self.scene.start('lobby');
           }
           else if (event.keyCode === 13 && ip.text.length == 0) {
             address = 'ballshock-server.herokuapp.com';
-            self.scene.start('multilevel');
+            self.scene.start('lobby');
           }
         });
   }

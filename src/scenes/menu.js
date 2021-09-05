@@ -13,16 +13,16 @@ export default class menu extends Phaser.Scene {
 		var quit = this.add.image(2120 / 2, 1000, "quit").setScale(3.0, 3.0);
 		var play = this.add.image(2120 / 2, 600.0, "play").setScale(3.0, 3.0);
 		var options = this.add.image(2120 / 2, 800.0, "options").setScale(3.0, 3.0);
-    loadout.setInteractive();
+    loadout.setInteractive({useHandCursor: true});
     loadout.on('pointerup', function () {
      this.scene.start('loadout');
    }, this);
-    name.setInteractive();
+    name.setInteractive({useHandCursor: true});
     name.on('pointerup', function () {
       localStorage.removeItem('name');
      this.scene.start('logo');
    }, this);
-    play.setInteractive();
+    play.setInteractive({useHandCursor: true});
     play.on('pointerup', function () {
       this.setFrame(0);
       self.scene.start('testlevel');
@@ -36,7 +36,7 @@ export default class menu extends Phaser.Scene {
     play.on('pointerout', function () {
       this.setFrame(0);
     })
-    multiplayer.setInteractive();
+    multiplayer.setInteractive({useHandCursor: true});
     multiplayer.on('pointerup', function () {
       this.setFrame(0);
       self.scene.start('enterip');
@@ -50,7 +50,7 @@ export default class menu extends Phaser.Scene {
     multiplayer.on('pointerout', function () {
       this.setFrame(0);
     })
-    options.setInteractive();
+    options.setInteractive({useHandCursor: true});
     options.on('pointerup', function () {
       this.setFrame(0);
     })
@@ -63,7 +63,7 @@ export default class menu extends Phaser.Scene {
     options.on('pointerout', function () {
       this.setFrame(0);
     })
-    quit.setInteractive();
+    quit.setInteractive({useHandCursor: true});
     quit.on('pointerup', function () {
       this.setFrame(0);
       close();

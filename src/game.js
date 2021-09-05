@@ -6,6 +6,8 @@ import logo from './scenes/logo';
 import menu from './scenes/menu';
 import enterip from './scenes/enterip';
 import loadout from './scenes/loadout';
+import lobby from './scenes/lobby';
+import room from './scenes/room';
 var width = 2120;
 var height = 1200;
 var config;
@@ -31,6 +33,6 @@ config = {
             gravity: {y: 800}
         }
     },
-    scene:[prelogo, menu, logo, testlevel, enterip, multilevel, loadout]
+    scene:[prelogo, menu, logo, testlevel, enterip, multilevel, loadout, lobby, room]
 };
 var game = new Phaser.Game(config);
