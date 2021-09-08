@@ -4,7 +4,7 @@ export default class prelogo extends Phaser.Scene {
     super({key: "prelogo"});
   }
 	preload(){
-    this.load.setPath('assets/');
+    this.load.setPath('assets/ui');
     this.load.image('logo', 'logo.png')
 }
 	create(){

@@ -4,28 +4,33 @@ export default class logo extends Phaser.Scene {
   }
 	preload(){
 	this.add.image( 2120 / 2, 1200 / 2 - 75, 'logo');
-  this.load.setPath('assets/');
+  this.load.setPath('assets/player');
   this.load.spritesheet('Character', 'Character.png', {frameWidth: 35, frameHeight: 35})
   this.load.spritesheet('CharacterWalljump', 'CharacterWalljump.png', {frameWidth: 35, frameHeight: 35})
   this.load.image('CharacterAfterimage', 'CharacterAfterimage.png')
+  this.load.setPath('assets/characters');
   this.load.image('Chronoshifter', 'Chronoshifter.png')
   this.load.image('Bastion', 'Bastion.png')
   this.load.image('GhostForce', 'GhostForce.png')
   this.load.image('AideUnit', 'AideUnit.png')
   this.load.image('Vizier', 'Vizier.png')
   this.load.image('Veteran', 'Veteran.png')
+  this.load.setPath('assets/guns/gun');
   this.load.image('gun1', 'gun1.png')
-  this.load.image('gun1Bullet', 'gun1Bullet.png')
   this.load.image('AncientDischargeGun', 'AncientDischargeGun.png')
-  this.load.image('AncientDischargeGunBullet', 'AncientDischargeBullet.png')
   this.load.image('ThunderScreamGun', 'thunderscreamGun.png')
-  this.load.image('ThunderScreamGunBullet', 'thunderscreamBullet.png')
   this.load.image('Boomsmith', 'Boomsmith.png')
-  this.load.image('BoomsmithBullet', 'BoomforgedGrenade.png')
   this.load.image('SolFlairGun', 'SolFlairGun.png')
-  this.load.image('SolFlairGunBullet', 'SolFlairGunBullet.png')
   this.load.image('SuperchargedFractal', 'SuperchargedFractal.png')
+  this.load.setPath('assets/guns/bullet');
+  this.load.image('gun1Bullet', 'gun1Bullet.png')
+  this.load.image('AncientDischargeGunBullet', 'AncientDischargeBullet.png')
+  this.load.image('ThunderScreamGunBullet', 'thunderscreamBullet.png')
+  this.load.image('BoomsmithBullet', 'BoomforgedGrenade.png')
+  this.load.image('SolFlairGunBullet', 'SolFlairGunBullet.png')
   this.load.image('SuperchargedFractalBullet', 'FractalBolt.png')
+  this.load.spritesheet('BoomforgedBlast', 'BoomforgedBlast.png', {frameWidth: 105, frameHeight: 105});
+  this.load.setPath('assets/ui');
   this.load.image('128rectangle', '128rectangle.png')
   this.load.image('250rectangle', '250rectangle.png')
   this.load.image('256rectangle', '256rectangle.png')
@@ -33,10 +38,8 @@ export default class logo extends Phaser.Scene {
   this.load.image('otherhpbar', 'otherhpbar.png')
   this.load.image('overheatbar', 'overheatbar.png')
   this.load.image('backbutton', 'backbutton.png')
-  this.load.image('healthpack', 'healthpack.png')
   this.load.image('remnants', 'remnants.png')
   this.load.spritesheet('overheattext', 'overheattext.png', {frameWidth: 49, frameHeight: 25})
-  this.load.spritesheet('healthstation', 'healthstation.png', {frameWidth: 40, frameHeight: 40})
   this.load.spritesheet('multiplayer', 'multiplayer.png', {frameWidth: 128, frameHeight: 64});
   this.load.spritesheet('play', 'play.png', {frameWidth: 128, frameHeight: 64});
   this.load.spritesheet('quit', 'quit.png', {frameWidth: 128, frameHeight: 64});
@@ -44,7 +47,13 @@ export default class logo extends Phaser.Scene {
   this.load.spritesheet('button1', 'button1.png', {frameWidth: 128, frameHeight: 128});
   this.load.spritesheet('button2', 'button2.png', {frameWidth: 128, frameHeight: 128});
   this.load.spritesheet('button3', 'button3.png', {frameWidth: 128, frameHeight: 128});
-  this.load.spritesheet('BoomforgedBlast', 'BoomforgedBlast.png', {frameWidth: 105, frameHeight: 105});
+  this.load.setPath('assets/sfx');
+  this.load.audio('SFX_AncientDischargeGunBullet', 'SFX_Ancient_Discharge.mp3')
+  this.load.audio('SFX_ThunderscreamGunBullet', 'SFX_Thunderscream.mp3')
+  this.load.audio('SFX_gun1Bullet', 'SFX_Funnel_Pipe.mp3')
+  this.load.audio('SFX_BoomsmithBullet', 'SFX_Boomsmith.mp3')
+  this.load.audio('SFX_Boomsmith_Explosion', 'SFX_Boomsmith_Explosion.mp3')
+  this.load.audio('SFX_Gun_Overheat', 'SFX_Gun_Overheat.mp3')
 }
 	create(){
     var self = this;

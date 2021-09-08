@@ -45,42 +45,47 @@ var myid;
 var morekill = 0;
 var ping;
 var elevator;
+var playsound;
+var overheatsound;
 export default class multilevel extends Phaser.Scene {
   constructor(){
     super({key: "multilevel"});
   }
 	preload(){
-    this.load.setPath('assets/');
-    this.load.image('elevator', 'elevator.png')
-    this.load.image('floor', 'floor.png')
-    this.load.image('floor_side', 'floor_side.png')
-    this.load.image('floor_small', 'floor_small.png')
-    this.load.image('floor_front', 'floor_front.png')
-    this.load.image('floor_bottom_small', 'floor_bottom_small.png')
-    this.load.image('floor_middle', 'floor_middle.png')
-    this.load.image('floor_middle_small', 'floor_middle_small.png')
-    this.load.image('floor_bottom_middle_small', 'floor_bottom_middle_small.png')
-    this.load.image('floor_side_small', 'floor_side_small.png')
-    this.load.image('floor_sidemiddle', 'floor_sidemiddle.png')
-    this.load.image('floor_topmiddle', 'floor_topmiddle.png')
-    this.load.image('floor_tube_up', 'floor_tube_up.png')
-    this.load.image('floor_tube_side', 'floor_tube_side.png')
-    this.load.image('floor_diag', 'floor_diag.png')
-    this.load.image('floor_diag_small', 'floor_diag_small.png')
-    this.load.image('floor_triple_small', 'floor_triple_small.png')
-    this.load.image('floor_side_small_line', 'floor_side_small_line.png')
-    this.load.image('floor_diag_withsmall', 'floor_diag_withsmall.png')
-    this.load.image('floor_vertical1', 'floor_vertical1.png')
-    this.load.image('floor_vertical2', 'floor_vertical2.png')
-    this.load.image('floor_vertical3', 'floor_vertical3.png')
-    this.load.image('floor_vertical4', 'floor_vertical4.png')
-    this.load.image('floor_vertical5', 'floor_vertical5.png')
-    this.load.image('floor_vertical6', 'floor_vertical6.png')
-    this.load.image('floor_vertical7', 'floor_vertical7.png')
-    this.load.image('floor_vertical8', 'floor_vertical8.png')
-    this.load.image('floor_vertical9', 'floor_vertical9.png')
-    this.load.image('floor_vertical10', 'floor_vertical10.png')
-    this.load.image('floor_bigvertical', 'floor_bigvertical.png')
+    if (map == 'remnants') {
+      this.load.setPath('assets/maps/remnants');
+      this.load.image('healthpack', 'healthpack.png')
+      this.load.spritesheet('healthstation', 'healthstation.png', {frameWidth: 40, frameHeight: 40})
+      this.load.image('elevator', 'elevator.png')
+      this.load.image('floor_side', 'floor_side.png')
+      this.load.image('floor_small', 'floor_small.png')
+      this.load.image('floor_front', 'floor_front.png')
+      this.load.image('floor_bottom_small', 'floor_bottom_small.png')
+      this.load.image('floor_middle', 'floor_middle.png')
+      this.load.image('floor_middle_small', 'floor_middle_small.png')
+      this.load.image('floor_bottom_middle_small', 'floor_bottom_middle_small.png')
+      this.load.image('floor_side_small', 'floor_side_small.png')
+      this.load.image('floor_sidemiddle', 'floor_sidemiddle.png')
+      this.load.image('floor_topmiddle', 'floor_topmiddle.png')
+      this.load.image('floor_tube_up', 'floor_tube_up.png')
+      this.load.image('floor_tube_side', 'floor_tube_side.png')
+      this.load.image('floor_diag', 'floor_diag.png')
+      this.load.image('floor_diag_small', 'floor_diag_small.png')
+      this.load.image('floor_triple_small', 'floor_triple_small.png')
+      this.load.image('floor_side_small_line', 'floor_side_small_line.png')
+      this.load.image('floor_diag_withsmall', 'floor_diag_withsmall.png')
+      this.load.image('floor_vertical1', 'floor_vertical1.png')
+      this.load.image('floor_vertical2', 'floor_vertical2.png')
+      this.load.image('floor_vertical3', 'floor_vertical3.png')
+      this.load.image('floor_vertical4', 'floor_vertical4.png')
+      this.load.image('floor_vertical5', 'floor_vertical5.png')
+      this.load.image('floor_vertical6', 'floor_vertical6.png')
+      this.load.image('floor_vertical7', 'floor_vertical7.png')
+      this.load.image('floor_vertical8', 'floor_vertical8.png')
+      this.load.image('floor_vertical9', 'floor_vertical9.png')
+      this.load.image('floor_vertical10', 'floor_vertical10.png')
+      this.load.image('floor_bigvertical', 'floor_bigvertical.png')
+    }
 }
 	create(){
     CanMove = true
@@ -395,6 +400,9 @@ export default class multilevel extends Phaser.Scene {
        disconlayer.setVisible(false)
     });
   }
+    this.game.events.off("blur", this.game.onGameBlur, this.game, false);
+    this.game.events.off("hidden", this.game.onHidden, this.game, false);
+    this.game.events.off("visible", this.game.onVisible, this.game, false);
 //keys
     var key_1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
     var key_2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
@@ -442,6 +450,26 @@ export default class multilevel extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers('BoomforgedBlast'),
       hideOnComplete: true
     });
+//audio
+    this.sound.add('SFX_AncientDischargeGunBullet')
+    this.sound.add('SFX_ThunderscreamGunBullet')
+    this.sound.add('SFX_gun1Bullet')
+    this.sound.add('SFX_BoomsmithBullet')
+    this.sound.add('SFX_Boomsmith_Explosion')
+    this.sound.add('SFX_Gun_Overheat')
+    playsound = function () {
+      let sounds = self.sound.get('SFX_' + selectedloadout.primary + 'Bullet')
+      sounds.pan = 0
+      sounds.volume = 1
+      sounds.play()
+    }
+    overheatsound = function () {
+      let sounds = self.sound.get('SFX_Gun_Overheat')
+      sounds.pan = 0
+      sounds.volume = 1
+      sounds.play()
+    }
+
 //floors
     floors = this.physics.add.staticGroup()
 //on
@@ -814,6 +842,20 @@ export default class multilevel extends Phaser.Scene {
       socket.on('bulletshotted', function (player, bulletname, velocityX, velocityY, gravity) {
             self.otherbullets[player.playerId].getChildren().forEach(function (otherbullet){
               if (otherbullet.name == bulletname) {
+                let sounds = self.sound.get('SFX_' + otherbullet.texture.key)
+                if (self.player.x > otherbullet.x) {
+                  sounds.volume = otherbullet.x / self.player.x
+                  sounds.pan = (-otherbullet.x - -self.player.x) / -self.player.x
+                }
+                else if (self.player.x < otherbullet.x) {
+                  sounds.volume = self.player.x / otherbullet.x
+                  sounds.pan = (+otherbullet.x - +self.player.x) / +otherbullet.x
+                }
+                else {
+                  sounds.pan = 0
+                  sounds.volume = 1
+                }
+                sounds.play()
                 otherbullet.body.allowGravity = gravity
                 otherbullet.setTexture(player.playergun + 'Bullet')
                 otherbullet.setPosition(player.x, player.y + 7);
@@ -898,6 +940,19 @@ export default class multilevel extends Phaser.Scene {
                   if (playerInfo.playerId === otherPlayer.playerId) {
                    var otheroverheat = self.add.sprite(playerInfo.x, playerInfo.y - 10, 'overheattext', 0).setDepth(36)
                    otheroverheat.anims.play('overheat!')
+                   let sounds = self.sound.get('SFX_Gun_Overheat')
+                   if (self.player.x > playerInfo.x) {
+                     sounds.volume = playerInfo.x / self.player.x
+                     sounds.pan = (-playerInfo.x - -self.player.x) / -self.player.x
+                   }
+                   else if (self.player.x < playerInfo.x) {
+                     sounds.volume = self.player.x / playerInfo.x
+                     sounds.pan = (+playerInfo.x - +self.player.x) / +playerInfo.x
+                   }
+                   else {
+                     sounds.pan = 0
+                     sounds.volume = 1
+                   }
                    otheroverheat.on('animationcomplete', function () {
                      otheroverheat.destroy()
                    })
@@ -998,6 +1053,8 @@ export default class multilevel extends Phaser.Scene {
               }
               }
             }
+            let sounds = self.sound.get('SFX_Boomsmith_Explosion')
+            sounds.play()
             let boomanimation = self.add.sprite(otherbullet.x, otherbullet.y, 'BoomforgedBlast', 0)
              otherbullet.setVelocity(0, 0)
              otherbullet.body.allowGravity = false
@@ -1622,6 +1679,7 @@ for (var i = 0; i < 6; i++) {
             }
             primary.bulletcooldown = primary.bulletcooldownconfig
             primary.overheat += primary.overheatadd;
+            playsound()
 //recoil
             if (this.player.flipX) {
               if (key_D.isDown) {
@@ -1701,6 +1759,7 @@ for (var i = 0; i < 6; i++) {
           overheattext.setPosition(this.player.x, this.player.y - 10)
           overheattext.setVisible(true)
           overheattext.anims.play('overheat!')
+          overheatsound()
           primary.overheat = 99
           socket.emit('overheat')
           primary.CanShoot = false
@@ -1723,6 +1782,7 @@ for (var i = 0; i < 6; i++) {
           overheattext.setPosition(this.player.x, this.player.y - 10)
           overheattext.setVisible(true)
           overheattext.anims.play('overheat!')
+          overheatsound()
           secondary.overheat = 99
           socket.emit('overheat')
           secondary.CanShoot = false
