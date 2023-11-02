@@ -80,6 +80,8 @@ export default class room extends Phaser.Scene {
         else if (roomMaker == true) {
           starttext.setVisible(false)
           startbutton.setVisible(false)
+          starttext.setVisible(true)
+          startbutton.setVisible(true)
         }
       }
       if (usernames[0] == null) {

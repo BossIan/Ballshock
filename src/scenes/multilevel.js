@@ -6,16 +6,15 @@ var key_A;
 var key_S;
 var key_D;
 var key_Space;
-var invincible = false;
-var invincibletimer = 60;
 var CanMove
 var speed = 195;
 var acceleration = 15;
 var primarygun;
 var spawned = false;
-var player;
 var name;
-var otherbullet;
+var leaderboardnames = [];
+var leaderboardkills = [];
+var leaderboarddeaths = [];
 var primary = {
   bulletspread: 0,
   bulletspeed: 0,
@@ -45,7 +44,8 @@ var myid;
 var morekill = 0;
 var ping;
 var elevator;
-var playsound;
+var playsoundprimary;
+var playsoundsecondary;
 var overheatsound;
 export default class multilevel extends Phaser.Scene {
   constructor(){
@@ -155,7 +155,7 @@ export default class multilevel extends Phaser.Scene {
     var gun1damage = 10
     var AncientDischargeGundamage = 13
     var ThunderScreamGundamage = 80
-    var SolFlairGundamage = 20
+    var SolFlairGundamage = 25
     var Boomsmithdamage = 35
     var SuperchargedFractaldamage = 3
     function gunconfig() {
@@ -163,21 +163,21 @@ export default class multilevel extends Phaser.Scene {
         primary.bulletspread = 30
         primary.bulletspeed = 600
         primary.bulletcooldownconfig = 0.1 * 60
-        primary.recoil = 45
-        primary.overheatadd = 10
+        primary.recoil = 15
+        primary.overheatadd = 8
       }
       else if (selectedloadout.primary == 'AncientDischargeGun') {
         primary.bulletspread = 100
         primary.bulletspeed = 1200
         primary.bulletcooldownconfig = 0.7 * 60
-        primary.recoil = 300
+        primary.recoil = 400
         primary.overheatadd = 40
       }
       else if (selectedloadout.primary == 'ThunderScreamGun') {
         primary.bulletspread = 0
-        primary.bulletspeed = 1100
+        primary.bulletspeed = 500
         primary.bulletcooldownconfig = 1 * 60
-        primary.recoil = 150
+        primary.recoil = 330
         primary.overheatadd = 60
       }
       else if (selectedloadout.primary == 'Boomsmith') {
@@ -210,6 +210,7 @@ export default class multilevel extends Phaser.Scene {
       self.character = self.physics.add.sprite(80, 1100, selectedloadout.character, 0).setDepth(35);
       self.character.body.allowGravity = false;
       afterimage = self.physics.add.image(self.player.x , self.player.y, 'Character' + 'Afterimage').setDepth(33).setVisible(false)
+      self.player.setMaxVelocity(400)
       afterimage.body.allowGravity = false;
       name = self.add.text(1060, 600 - 35, savedname, { font: '15px Corbel', fill: '#000000' }).setDepth(36).setScrollFactor(0);
       name.setOrigin( 0.5, 0);
@@ -452,13 +453,20 @@ export default class multilevel extends Phaser.Scene {
     });
 //audio
     this.sound.add('SFX_AncientDischargeGunBullet')
-    this.sound.add('SFX_ThunderscreamGunBullet')
+    this.sound.add('SFX_ThunderScreamGunBullet')
     this.sound.add('SFX_gun1Bullet')
     this.sound.add('SFX_BoomsmithBullet')
     this.sound.add('SFX_Boomsmith_Explosion')
+    this.sound.add('SFX_SolFlairGunBullet')
     this.sound.add('SFX_Gun_Overheat')
-    playsound = function () {
+    playsoundprimary = function () {
       let sounds = self.sound.get('SFX_' + selectedloadout.primary + 'Bullet')
+      sounds.pan = 0
+      sounds.volume = 1
+      sounds.play()
+    }
+    playsoundsecondary = function () {
+      let sounds = self.sound.get('SFX_' + selectedloadout.secondary + 'Bullet')
       sounds.pan = 0
       sounds.volume = 1
       sounds.play()
@@ -598,7 +606,6 @@ export default class multilevel extends Phaser.Scene {
       if (CanMove == true) {
         if (spawned) {
           if (self.player.body.touching.left && self.player.body.touching.down != true) {
-            CanMove = false;
             self.player.setVelocityX(200);
             self.player.setVelocityY(-250);
             self.player.anims.play('walljump');
@@ -606,12 +613,10 @@ export default class multilevel extends Phaser.Scene {
             afterimage.setVisible(true)
             socket.emit('playeranim', { curanim: self.player.anims.currentAnim.key})
             self.player.on('animationcomplete', function () {
-              CanMove = true;
               afterimage.setVisible(false)
            })
           }
           else if (self.player.body.touching.right && self.player.body.touching.down != true) {
-            CanMove = false;
             self.player.setVelocityX(-200);
             self.player.setVelocityY(-250);
             self.player.anims.play('walljump');
@@ -619,7 +624,6 @@ export default class multilevel extends Phaser.Scene {
             afterimage.setVisible(true)
             socket.emit('playeranim', { curanim: self.player.anims.currentAnim.key})
             self.player.on('animationcomplete', function () {
-              CanMove = true;
               afterimage.setVisible(false)
            })
           }
@@ -631,28 +635,22 @@ export default class multilevel extends Phaser.Scene {
       if (CanMove == true) {
         if (spawned) {
            if (key_D.isDown) {
-            CanMove = false;
             self.player.setVelocityX(350);
             self.player.anims.play('dash')
             afterimage.setPosition(self.player.x , self.player.y)
             afterimage.setVisible(true)
             socket.emit('playeranim', { curanim: self.player.anims.currentAnim.key})
             self.player.on('animationcomplete', function () {
-              CanMove = true
-              self.player.setVelocityX(speed);
               afterimage.setVisible(false)
            })
           }
             else if (key_A.isDown) {
-            CanMove = false;
             self.player.setVelocityX(-350);
             self.player.anims.play('dash')
             afterimage.setPosition(self.player.x , self.player.y)
             afterimage.setVisible(true)
             socket.emit('playeranim', { curanim: self.player.anims.currentAnim.key})
             self.player.on('animationcomplete', function () {
-              CanMove = true
-              self.player.setVelocityX(-speed);
               afterimage.setVisible(false)
            })
            }
@@ -807,6 +805,10 @@ export default class multilevel extends Phaser.Scene {
             });
           });
       socket.on('testyo', function (players, room) {
+        self.add.text(650, 375, "Leaderboard", { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
+        self.add.text(650, 400, "Names", { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
+        self.add.text(800, 400, "Kills", { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
+        self.add.text(950, 400, "Deaths", { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
         Object.keys(players).forEach(function (id) {
           if (room !== roomId) return
           if (socket.id == id) return
@@ -830,6 +832,15 @@ export default class multilevel extends Phaser.Scene {
           });
         });
       })
+      socket.on('leaderboardCreate', function (leaderboardData) {
+        var i = 0;
+        Object.keys(leaderboardData).forEach(user => {
+          leaderboardnames[i] = self.add.text(650, 420 + i*20, leaderboardData[user].playername, { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
+          leaderboardkills[i] = self.add.text(800, 420 + i*20, leaderboardData[user].kills, { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
+          leaderboarddeaths[i] = self.add.text(950, 420 + i*20, leaderboardData[user].kills, { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
+          i++;
+        });
+      })
       socket.on('bullethitted', function (playerInfo) {
             self.otherbullets[playerInfo.player].getChildren().forEach(function (otherbullet) {
              if (otherbullet.name == playerInfo.bulletname.name) {
@@ -840,16 +851,16 @@ export default class multilevel extends Phaser.Scene {
             });
            });
       socket.on('bulletshotted', function (player, bulletname, velocityX, velocityY, gravity) {
-            self.otherbullets[player.playerId].getChildren().forEach(function (otherbullet){
+        self.otherbullets[player.playerId].getChildren().forEach(function (otherbullet){
               if (otherbullet.name == bulletname) {
                 let sounds = self.sound.get('SFX_' + otherbullet.texture.key)
-                if (self.player.x > otherbullet.x) {
-                  sounds.volume = otherbullet.x / self.player.x
-                  sounds.pan = (-otherbullet.x - -self.player.x) / -self.player.x
+                if (self.player.x > player.x) {
+                  sounds.volume = player.x/self.player.x
+                  sounds.pan = (player.x - self.player.x)/self.player.x
                 }
-                else if (self.player.x < otherbullet.x) {
-                  sounds.volume = self.player.x / otherbullet.x
-                  sounds.pan = (+otherbullet.x - +self.player.x) / +otherbullet.x
+                else if (self.player.x < player.x) {
+                  sounds.volume = self.player.x/player.x
+                  sounds.pan = (player.x - self.player.x)/player.x
                 }
                 else {
                   sounds.pan = 0
@@ -959,7 +970,14 @@ export default class multilevel extends Phaser.Scene {
                   }
                 });
              })
-      socket.on('KillBroadcast', function (kill) {
+      socket.on('KillBroadcast', function (kill, leaderboardData) {
+                var i = 0;
+                for (let i = 0; i < leaderboardData.length; i++) {
+                  var array = leaderboardData[i];
+                  leaderboardnames[i].text = array[1].playername
+                  leaderboardkills[i].text = array[1].kills
+                  leaderboarddeaths[i].text = array[1].deaths
+                }
                 var killertextx = 1060;
                 var killedtextx = 1060;
                 var killY = 390;
@@ -992,7 +1010,7 @@ export default class multilevel extends Phaser.Scene {
                 }
                 var killergun = self.add.image(1060, killY, kill.killer.playergun).setDepth(60).setScrollFactor(0)
                 var killertext = self.add.text(killertextx, killY, kill.killer.playername).setDepth(60).setScrollFactor(0).setOrigin(1, 0.5)
-                var killedtext = self.add.text(killedtextx, killY, kill.killed).setDepth(60).setScrollFactor(0).setOrigin(0, 0.5)
+                var killedtext = self.add.text(killedtextx, killY, kill.killed.playername).setDepth(60).setScrollFactor(0).setOrigin(0, 0.5)
                 morekill += 1
                 setTimeout(function () {
                   killergun.destroy()
@@ -1679,24 +1697,16 @@ for (var i = 0; i < 6; i++) {
             }
             primary.bulletcooldown = primary.bulletcooldownconfig
             primary.overheat += primary.overheatadd;
-            playsound()
+            playsoundprimary()
 //recoil
             if (this.player.flipX) {
-              if (key_D.isDown) {
-                this.player.body.velocity.x = speed
-              }
-              else {
                 this.player.body.velocity.x += primary.recoil
-              }
+              
             }
             else {
-              if (key_A.isDown) {
-                this.player.body.velocity.x = -speed
-              }
-              else {
                 this.player.body.velocity.x -= primary.recoil
-              }
-          }
+              
+            }
         }
       }
       else if (selectedgun == 'secondary') {
@@ -1733,23 +1743,16 @@ for (var i = 0; i < 6; i++) {
             }
             secondary.bulletcooldown = secondary.bulletcooldownconfig
             secondary.overheat += secondary.overheatadd;
+            playsoundsecondary()
 //recoil
             if (this.player.flipX) {
-              if (key_D.isDown) {
-                this.player.body.velocity.x = speed
-              }
-              else {
                 this.player.body.velocity.x += secondary.recoil
-              }
+              
             }
             else {
-              if (key_A.isDown) {
-                this.player.body.velocity.x = -speed
-              }
-              else {
                 this.player.body.velocity.x -= secondary.recoil
-              }
-         }
+              
+            }
        }
      }
         if (primary.overheat >= 100) {
@@ -1847,10 +1850,13 @@ for (var i = 0; i < 6; i++) {
             }
           }
           if (key_Space.isDown && this.player.body.touching.down) {
-            this.player.setVelocityY(-375);
+            this.player.setVelocityY(-400);
           }
           else if(key_W.isDown && this.player.body.touching.down){
-            this.player.setVelocityY(-375);
+            this.player.setVelocityY(-400);
+          }
+          if (key_S.isDown) {
+            this.player.body.velocity.y += acceleration
           }
         }
 // emit player movement

@@ -4,7 +4,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   devServer: {
-  host: '192.168.100.29',
+  host: '192.168.100.37',
 },
   module: {
     rules: [

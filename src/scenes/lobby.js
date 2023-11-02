@@ -274,7 +274,7 @@ export default class lobby extends Phaser.Scene {
 		createroomrect.isFilled = true;
 		var createroom = this.add.text(718, 1144, "Create Room", {color:"#000000ff",fontSize:"50px"}).setOrigin(0.5, 0.5);
     var username = self.add.text(115, 90, '', {"fontSize":"50px"});
-    socket = io('http://' + address, {
+    socket = io('https://' + address, {
        reconnection: false,
        reconnectionDelayMax: 10000,
       });

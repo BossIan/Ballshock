@@ -49,11 +49,12 @@ export default class logo extends Phaser.Scene {
   this.load.spritesheet('button3', 'button3.png', {frameWidth: 128, frameHeight: 128});
   this.load.setPath('assets/sfx');
   this.load.audio('SFX_AncientDischargeGunBullet', 'SFX_Ancient_Discharge.mp3')
-  this.load.audio('SFX_ThunderscreamGunBullet', 'SFX_Thunderscream.mp3')
+  this.load.audio('SFX_ThunderScreamGunBullet', 'SFX_Thunderscream.mp3')
   this.load.audio('SFX_gun1Bullet', 'SFX_Funnel_Pipe.mp3')
   this.load.audio('SFX_BoomsmithBullet', 'SFX_Boomsmith.mp3')
   this.load.audio('SFX_Boomsmith_Explosion', 'SFX_Boomsmith_Explosion.mp3')
   this.load.audio('SFX_Gun_Overheat', 'SFX_Gun_Overheat.mp3')
+  this.load.audio('SFX_SolFlairGunBullet', 'SFX_SolFlairGunBullet.mp3')
 }
 	create(){
     var self = this;

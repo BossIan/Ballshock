@@ -34,7 +34,7 @@ export default class enterip extends Phaser.Scene {
             self.scene.start('lobby');
           }
           else if (event.keyCode === 13 && ip.text.length == 0) {
-            address = 'ballshock-server.herokuapp.com';
+            address = 'ballshock-server.onrender.com';
             self.scene.start('lobby');
           }
         });
