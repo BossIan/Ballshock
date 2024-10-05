@@ -11,7 +11,7 @@ export default class menu extends Phaser.Scene {
     var loadout = this.add.text(100, 1000, 'Loadout', { font: '80px Courier', fill: '#000000' });
     var multiplayer = this.add.image(2120 / 2, 400.0, "multiplayer").setScale(3.0, 3.0);
 		var quit = this.add.image(2120 / 2, 1000, "quit").setScale(3.0, 3.0);
-		var play = this.add.image(2120 / 2, 600.0, "play").setScale(3.0, 3.0);
+		var play = this.add.image(2120 / 2, 600.0, "play").setScale(3.0, 3.0).setVisible(false);
 		var options = this.add.image(2120 / 2, 800.0, "options").setScale(3.0, 3.0);
     loadout.setInteractive({useHandCursor: true});
     loadout.on('pointerup', function () {
