@@ -1,6 +1,8 @@
 import {socket} from './lobby'
 import {roomId} from './lobby'
 import {map} from './room'
+var disconnected = false;
+var smalljoystick;
 var key_W;
 var key_A;
 var key_S;
@@ -15,6 +17,8 @@ var name;
 var leaderboardnames = [];
 var leaderboardkills = [];
 var leaderboarddeaths = [];
+var mobile = false;
+var shootMobile = false;
 var primary = {
   bulletspread: 0,
   bulletspeed: 0,
@@ -37,7 +41,7 @@ var selectedgun;
 var Health;
 var overheatgrpx;
 var overheattext;
-var healthtext;
+var healthbar;
 var selectedloadout;
 var afterimage;
 var myid;
@@ -47,6 +51,7 @@ var elevator;
 var playsoundprimary;
 var playsoundsecondary;
 var overheatsound;
+var cam;
 export default class multilevel extends Phaser.Scene {
   constructor(){
     super({key: "multilevel"});
@@ -86,7 +91,12 @@ export default class multilevel extends Phaser.Scene {
       this.load.image('floor_vertical10', 'floor_vertical10.png')
       this.load.image('floor_bigvertical', 'floor_bigvertical.png')
     }
-}
+    this.load.setPath('assets/ui/mobile');
+    this.load.image('pause', 'pause/Default.png')
+    this.load.image('shoot', 'shoot/Default.png')
+    this.load.image('sprint', 'sprint/Default.png')
+    this.load.image('change', 'change/Default.png')
+  }
 	create(){
     CanMove = true
     Health = 100;
@@ -124,7 +134,110 @@ export default class multilevel extends Phaser.Scene {
     var charactertext = this.add.text(1060, 620, "Character", {"color":"#050101ff"}).setScale(2, 2).setOrigin(0.5, 0).setScrollFactor(0).setDepth(60);
 		var primarytext = this.add.text(996, 500, "Primary", {"color":"#060606ff"}).setOrigin(0.5, 0).setScrollFactor(0).setDepth(60).setDepth(60);
 		var secondarytext = this.add.text(1124, 500, "Secondary", {"color":"#000000ff"}).setOrigin(0.5, 0).setScrollFactor(0).setDepth(60);
+		var pauseBtn = this.add.image(1400, 405, 'pause').setOrigin(0, 0.5).setScrollFactor(0).setDepth(59).setInteractive().on('pointerdown', function () {
+      spawned = false;
+      socket.disconnect();
+      ping.destroy()
+      self.scene.start('menu')
+    })
 
+    //mobile 
+    if (this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
+      mobile = true
+      this.input.addPointer(5);
+      var shootBtn = this.add.image(1320, 790, 'shoot').setOrigin(0, 0.5).setScrollFactor(0).setDepth(30).setInteractive().on('pointerdown', function () {
+        shootMobile = true
+      })
+      shootBtn.on('pointerup', function () {
+        shootMobile = false;
+      })
+      var sprintBtn = this.add.image(1220, 790, 'sprint').setOrigin(0, 0.5).setScrollFactor(0).setDepth(30).setInteractive().on('pointerdown', function () {
+        key_Shift = true;
+      })
+      sprintBtn.on('pointerup', function () {
+        key_Shift = false;
+      })
+      var changeBtn = this.add.image(1060, 790, 'change').setOrigin(0, 0.5).setScrollFactor(0).setDepth(30).setInteractive().on('pointerdown', function () {
+        if (selectedgun == 'secondary') {
+          CanMove = true;
+          selectedgun = 'primary'
+          primarygun.setTexture(selectedloadout.primary)
+          socket.emit('changeloadout', {character: selectedloadout.character, gun: primarygun.texture.key})
+        }
+        else {
+          CanMove = true;
+          selectedgun = 'secondary'
+          primarygun.setTexture(selectedloadout.secondary)
+          socket.emit('changeloadout', {character: selectedloadout.character, gun: primarygun.texture.key})
+        }
+      })
+      var joystick = this.add.ellipse(800, 720, 200, 200).setScrollFactor(0).setDepth(30).setInteractive();
+      smalljoystick = this.add.ellipse(800, 720, 50, 50, '#000000').setDepth(30).setVisible(false);
+      this.input.on('pointermove', function (pointer) {
+        if(!pointer.isDown){
+          self.activeMobile = false
+        }
+        if(!self.activeMobile) return
+          smalljoystick.setVisible(false)
+         primarygun.rotation = Phaser.Math.Angle.Between(joystick.x, joystick.y, self.input.activePointer.x + 400, self.input.activePointer.y - 200);
+         socket.emit('gunRotatement', { gunrotation: primarygun.rotation})
+            if (joystick.x < self.input.activePointer.x + 400) {
+              self.player.flipX = false;
+              self.character.flipX = false;
+            socket.emit('playerflip', { flipped: self.player.flipX})
+           }
+           else if (joystick.x > self.input.activePointer.x + 400) {
+            self.player.flipX = true;
+            self.character.flipX = true;
+            socket.emit('playerflip', { flipped: self.player.flipX})
+           }
+         if (self.moveMobile) {
+          if (joystick.x < self.input.activePointer.x + 400) {
+             key_D.isDown = true
+             key_A.isDown = false
+          }
+          else if (joystick.x > self.input.activePointer.x + 400) {
+            key_A.isDown = true
+            key_D.isDown = false
+          }
+          if (joystick.y < self.input.activePointer.y - 250) {
+              key_S.isDown = true
+              for (var i = 1; i < elevator.children.size + 1; i++) {
+                elevator[i].body.checkCollision.up = false;
+                setTimeout(function () {
+                  this.body.checkCollision.up = true;
+                }.bind(elevator[i]), 500)
+              }
+          } else if(joystick.y > self.input.activePointer.y -70){
+            key_W.isDown = true
+  
+          }
+          else{
+            key_S.isDown = false
+            key_W.isDown = false
+  
+          }
+         }
+      }
+      )
+      joystick.on('pointerdown', function () {
+        self.activeMobile = true;
+      })
+      joystick.on('pointerout', function () {
+        self.moveMobile = true;
+      }
+      ) 
+      joystick.on('pointerover', function () {
+        self.moveMobile = false;
+        key_D.isDown = false
+        key_A.isDown = false
+        key_S.isDown = false
+        key_W.isDown = false
+      }
+      )
+      joystick.isFilled = true;
+    }
+   
     var loadoutopened = true;
     var loadoutselection = this.add.layer().setDepth(60);
     loadoutselection.add(primarytext)
@@ -170,7 +283,7 @@ export default class multilevel extends Phaser.Scene {
         primary.bulletspread = 100
         primary.bulletspeed = 1200
         primary.bulletcooldownconfig = 0.7 * 60
-        primary.recoil = 400
+        primary.recoil = 405
         primary.overheatadd = 40
       }
       else if (selectedloadout.primary == 'ThunderScreamGun') {
@@ -210,16 +323,18 @@ export default class multilevel extends Phaser.Scene {
       self.character = self.physics.add.sprite(80, 1100, selectedloadout.character, 0).setDepth(35);
       self.character.body.allowGravity = false;
       afterimage = self.physics.add.image(self.player.x , self.player.y, 'Character' + 'Afterimage').setDepth(33).setVisible(false)
-      self.player.setMaxVelocity(400)
+      self.player.setMaxVelocity(405)
       afterimage.body.allowGravity = false;
-      name = self.add.text(1060, 600 - 35, savedname, { font: '15px Corbel', fill: '#000000' }).setDepth(36).setScrollFactor(0);
+      name = self.add.text(self.player.x, self.player.y, savedname, { font: '15px Corbel', fill: '#FFFFFF' }).setDepth(36)
       name.setOrigin( 0.5, 0);
-      camera.startFollow(self.player);
+      cam = self.physics.add.image(self.player.x , self.player.y, 'Character' + 'Afterimage').setVisible(false)
+      cam.body.allowGravity = false;
+      camera.startFollow(cam);
       self.player.anims.play('dash')
       socket.emit('playeranim', { curanim: self.player.anims.currentAnim.key})
       primarygun = self.add.image(self.player.x, self.player.y, selectedloadout.primary).setDepth(36);
       self.player.body.collideWorldBounds = true;
-      healthtext = self.add.image( 1060, 600 + 25, 'hpbar').setDepth(36).setScrollFactor(0).setScale(0.5, 0.5).setOrigin( 0.5, 0);
+      healthbar = self.add.image( self.player.x, self.player.y, 'hpbar').setDepth(36).setScale(0.5, 0.5).setDepth(36)
       overheattext = self.add.sprite( self.player.x, self.player.y , 'overheattext', 0).setDepth(36).setVisible(false);
       overheatgrpx = self.add.image( 1060, 635 , 'overheatbar').setDepth(36).setScrollFactor(0).setScale(0.5, 0.5).setOrigin( 0.5, 0);
       spawned = true;
@@ -260,7 +375,7 @@ export default class multilevel extends Phaser.Scene {
                 loadouttext.setVisible(true)
                 CanMove = false;
                 self.player.setVelocity(0, 0)
-                healthtext.setVisible(false);
+                healthbar.setVisible(false);
                 self.player.setActive(false);
                 self.player.setVisible(false);
                 self.character.setVisible(false);
@@ -269,7 +384,7 @@ export default class multilevel extends Phaser.Scene {
                 socket.emit('dead', {killed: myid, killer: otherbullet.playerId})
               }
               else {
-                healthtext.setCrop(0, 0, Health / 100 * 100, 8)
+                healthbar.setCrop(0, 0, Health / 100 * 100, 8)
               }
               otherbullet.setActive(false)
               otherbullet.setVisible(false)
@@ -295,7 +410,7 @@ export default class multilevel extends Phaser.Scene {
               else {
                 Health += 30
               }
-              healthtext.setCrop(0, 0, Health / 100 * 100, 8)
+              healthbar.setCrop(0, 0, Health / 100 * 100, 8)
               socket.emit('healthpackGot', healthpack.name)
               socket.emit('healthupdate', { hp: Health})
             }
@@ -317,7 +432,7 @@ export default class multilevel extends Phaser.Scene {
       var otherGun = self.otherGuns.create(playerInfo.x, playerInfo.y + 13, playerInfo.playergun)
       otherGun.body.allowGravity = false;
       otherGun.playerId = playerInfo.playerId;
-      var otherName = self.add.text(playerInfo.x, playerInfo.y - 35, playerInfo.playername, { font: '15px Corbel', fill: '#000000' }).setDepth(30);
+      var otherName = self.add.text(playerInfo.x, playerInfo.y - 35, playerInfo.playername, { font: '15px Corbel', fill: '#FFFFFF' }).setDepth(30);
       otherName.setOrigin( 0.5, 0);
       otherName.playerId = playerInfo.playerId;
       self.otherNames.add(otherName);
@@ -337,6 +452,7 @@ export default class multilevel extends Phaser.Scene {
       }
     }
     function disconnect() {
+      disconnected = true;
     var disconlayer = self.add.layer().setDepth(60);
      var disconnectrect = self.add.rectangle(1060, 600, 400, 200).setScrollFactor(0).setDepth(60);
       disconnectrect.isFilled = true;
@@ -369,7 +485,7 @@ export default class multilevel extends Phaser.Scene {
        if (spawned) {
          self.player.destroy();
          primarygun.destroy();
-         healthtext.destroy();
+         healthbar.destroy();
          name.destroy();
          afterimage.destroy();
          self.otherbullets[myid].destroy()
@@ -380,6 +496,8 @@ export default class multilevel extends Phaser.Scene {
        self.scene.start('menu')
     });
      retryrect.on('pointerup', function () {
+       setTimeout(function () {
+        disconnected = false;
        socket.emit('dead', {killed: myid, killer: myid})
        spawnrect.setVisible(true)
        spawntext.setVisible(true)
@@ -389,16 +507,56 @@ export default class multilevel extends Phaser.Scene {
        self.player.setVelocity(0, 0)
        retryrect.setVisible(false)
        quitrect.setVisible(false)
-       healthtext.setVisible(false);
+       healthbar.setVisible(false);
        self.player.setActive(false);
        self.player.setVisible(false);
        self.character.setVisible(false);
        primarygun.setVisible(false);
        name.setVisible(false);
        Health = 0
-       healthtext.setCrop(0, 0, Health / 100 * 100, 8)
+       healthbar.setCrop(0, 0, Health / 100 * 100, 8)
        socket.emit('healthupdate', { hp: Health})
        disconlayer.setVisible(false)
+     }, 2500)
+       setTimeout(function () {
+        gunconfig();
+        loadoutselection.setVisible(false)
+        rect1.setVisible(false)
+        rect2.setVisible(false)
+        rect3.setVisible(false)
+        loadoutrect.setVisible(false)
+        loadouttext.setVisible(false)
+        self.player.setActive(true);
+        self.player.setVisible(true);
+        self.character.setVisible(true);
+        primarygun.setVisible(true);
+        name.setVisible(true);
+        healthbar.setVisible(true);
+        if (selectedgun == 'primary') {
+          primarygun.setTexture(selectedloadout.primary)
+        }
+        else {
+          primarygun.setTexture(selectedloadout.secondary)
+        }
+        Health = 100
+        healthbar.setCrop(0, 0, Health / 100 * 100, 8)
+        socket.emit('healthupdate', { hp: Health})
+        CanMove = true;
+        var randomLocation = Phaser.Math.Between(0, 100);
+        if (randomLocation <= 25) {
+          self.player.setPosition(80, 1140);
+        }
+        else if (randomLocation > 25 && randomLocation <= 50) {
+          self.player.setPosition(2000, 1140);
+        }
+        else if (randomLocation > 50 && randomLocation <= 75) {
+          self.player.setPosition(600, 300);
+        }
+        else {
+          self.player.setPosition(1500, 300);
+        }
+        socket.emit('alive')
+      }, 2500)
     });
   }
     this.game.events.off("blur", this.game.onGameBlur, this.game, false);
@@ -543,7 +701,7 @@ export default class multilevel extends Phaser.Scene {
         self.character.setVisible(true);
         primarygun.setVisible(true);
         name.setVisible(true);
-        healthtext.setVisible(true);
+        healthbar.setVisible(true);
         if (selectedgun == 'primary') {
           primarygun.setTexture(selectedloadout.primary)
         }
@@ -551,7 +709,7 @@ export default class multilevel extends Phaser.Scene {
           primarygun.setTexture(selectedloadout.secondary)
         }
         Health = 100
-        healthtext.setCrop(0, 0, Health / 100 * 100, 8)
+        healthbar.setCrop(0, 0, Health / 100 * 100, 8)
         socket.emit('healthupdate', { hp: Health})
         CanMove = true;
         var randomLocation = Phaser.Math.Between(0, 100);
@@ -635,7 +793,7 @@ export default class multilevel extends Phaser.Scene {
       if (CanMove == true) {
         if (spawned) {
            if (key_D.isDown) {
-            self.player.setVelocityX(350);
+            self.player.setVelocityX(345);
             self.player.anims.play('dash')
             afterimage.setPosition(self.player.x , self.player.y)
             afterimage.setVisible(true)
@@ -645,7 +803,7 @@ export default class multilevel extends Phaser.Scene {
            })
           }
             else if (key_A.isDown) {
-            self.player.setVelocityX(-350);
+            self.player.setVelocityX(-345);
             self.player.anims.play('dash')
             afterimage.setPosition(self.player.x , self.player.y)
             afterimage.setVisible(true)
@@ -661,7 +819,7 @@ export default class multilevel extends Phaser.Scene {
       socket.off()
       socket.emit('ingame')
       myid = socket.id
-      ping = this.add.text( 1340, 375, 'ping: ', { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
+      ping = this.add.text( 1300, 375, 'ping: ', { font: '20px', fill: '#FFFFFF' }).setScrollFactor(0).setDepth(30);
       socket.emit("ping", () => {
       let start = Date.now();
       let latency = Date.now() - start;
@@ -672,7 +830,9 @@ export default class multilevel extends Phaser.Scene {
           let latency = Date.now() - start;
           ping.text = 'ping: ' + latency;
           if (latency >= 1000) {
-            disconnect();
+            if (!disconnected) {
+              disconnect();
+            }
           }
         });
       }, 1000);
@@ -714,7 +874,9 @@ export default class multilevel extends Phaser.Scene {
            });
       socket.on('disconnect', function (reason){
         if (reason === "io client disconnect" || reason === 'io server disconnect' || reason === 'transport error') return
-             disconnect();
+        if (!disconnected) {
+          disconnect();
+        }
            })
       socket.on('alived', function (playerInfo) {
              self.otherPlayers.getChildren().forEach(function (otherPlayer) {
@@ -805,10 +967,10 @@ export default class multilevel extends Phaser.Scene {
             });
           });
       socket.on('testyo', function (players, room) {
-        self.add.text(650, 375, "Leaderboard", { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
-        self.add.text(650, 400, "Names", { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
-        self.add.text(800, 400, "Kills", { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
-        self.add.text(950, 400, "Deaths", { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
+        self.add.text(650, 375, "Leaderboard", { font: '20px', fill: '#FFFFFF' }).setScrollFactor(0).setDepth(30);
+        self.add.text(650, 400, "Names", { font: '20px', fill: '#FFFFFF' }).setScrollFactor(0).setDepth(30);
+        self.add.text(800, 400, "Kills", { font: '20px', fill: '#FFFFFF' }).setScrollFactor(0).setDepth(30);
+        self.add.text(950, 400, "Deaths", { font: '20px', fill: '#FFFFFF' }).setScrollFactor(0).setDepth(30);
         Object.keys(players).forEach(function (id) {
           if (room !== roomId) return
           if (socket.id == id) return
@@ -835,9 +997,9 @@ export default class multilevel extends Phaser.Scene {
       socket.on('leaderboardCreate', function (leaderboardData) {
         var i = 0;
         Object.keys(leaderboardData).forEach(user => {
-          leaderboardnames[i] = self.add.text(650, 420 + i*20, leaderboardData[user].playername, { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
-          leaderboardkills[i] = self.add.text(800, 420 + i*20, leaderboardData[user].kills, { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
-          leaderboarddeaths[i] = self.add.text(950, 420 + i*20, leaderboardData[user].kills, { font: '20px', fill: '#000000' }).setScrollFactor(0).setDepth(30);
+          leaderboardnames[i] = self.add.text(650, 420 + i*20, leaderboardData[user].playername, { font: '20px', fill: '#FFFFFF' }).setScrollFactor(0).setDepth(30);
+          leaderboardkills[i] = self.add.text(800, 420 + i*20, leaderboardData[user].kills, { font: '20px', fill: '#FFFFFF' }).setScrollFactor(0).setDepth(30);
+          leaderboarddeaths[i] = self.add.text(950, 420 + i*20, leaderboardData[user].kills, { font: '20px', fill: '#FFFFFF' }).setScrollFactor(0).setDepth(30);
           i++;
         });
       })
@@ -1055,7 +1217,7 @@ export default class multilevel extends Phaser.Scene {
                     loadouttext.setVisible(true)
                     CanMove = false;
                     self.player.setVelocity(0, 0)
-                    healthtext.setVisible(false);
+                    healthbar.setVisible(false);
                     self.player.setActive(false);
                     self.player.setVisible(false);
                     self.character.setVisible(false);
@@ -1064,7 +1226,7 @@ export default class multilevel extends Phaser.Scene {
                     socket.emit('dead', {killed: myid, killer: otherbullet.playerId})
                   }
                   else {
-                    healthtext.setCrop(0, 0, Health / 100 * 100, 8)
+                    healthbar.setCrop(0, 0, Health / 100 * 100, 8)
                   }
                   socket.emit('healthupdate', { hp: Health})
                 }
@@ -1624,12 +1786,17 @@ for (var i = 0; i < 6; i++) {
       });
 	}
   update(){
+    if(mobile){
+var shootNow = shootMobile
+    } else {
+var  shootNow = this.input.activePointer.isDown
+    }
     if (spawned) {
       primary.bulletcooldown -= 1
       secondary.bulletcooldown -= 1
       if (selectedgun == 'primary') {
         overheatgrpx.setCrop(0, 0, primary.overheat / 100 * 100, 8)
-        if (this.input.activePointer.isDown && this.player.active && primary.CanShoot && primary.bulletcooldown <= 0) {
+        if (shootNow && this.player.active && primary.CanShoot && primary.bulletcooldown <= 0) {
             if (selectedloadout.primary == 'gun1') {
               var thebullet = this.otherbullets[myid].getFirstDead();
               thebullet.setTexture(selectedloadout.primary + 'Bullet')
@@ -1682,6 +1849,7 @@ for (var i = 0; i < 6; i++) {
               thebullet.x = primarygun.x;
               thebullet.y = primarygun.y;
               thebullet.body.allowGravity = true;
+              thebullet.body.setBounce(0.25, 0.5);
               thebullet.setActive(true);
               thebullet.setVisible(true);
               var bulletspreadcalc = Phaser.Math.Between(primary.bulletspread, -primary.bulletspread);
@@ -1711,7 +1879,7 @@ for (var i = 0; i < 6; i++) {
       }
       else if (selectedgun == 'secondary') {
         overheatgrpx.setCrop(0, 0, secondary.overheat / 100 * 100, 8)
-        if (this.input.activePointer.isDown && this.player.active && secondary.CanShoot && secondary.bulletcooldown  <= 0) {
+        if (shootNow && this.player.active && secondary.CanShoot && secondary.bulletcooldown  <= 0) {
             if (selectedloadout.secondary == 'SolFlairGun') {
               var thebullet = this.otherbullets[myid].getFirstDead();
               thebullet.setTexture(selectedloadout.secondary + 'Bullet')
@@ -1807,34 +1975,41 @@ for (var i = 0; i < 6; i++) {
 //primarygun
       primarygun.x = this.player.x;
       primarygun.y = this.player.y + 7;
-      if (this.input.activePointer.oldPosition && (pointx !== this.input.activePointer.oldPosition.pointx || pointy !== this.input.activePointer.oldPosition.pointy)) {
-        primarygun.rotation = Phaser.Math.Angle.Between(primarygun.x, primarygun.y, this.input.activePointer.worldX , this.input.activePointer.worldY);
-        socket.emit('gunRotatement', { gunrotation: primarygun.rotation})
-        if (this.input.activePointer.worldX > this.player.x) {
-          this.player.flipX = false;
-          this.character.flipX = false;
-          socket.emit('playerflip', { flipped: this.player.flipX})
+      if (!mobile) {
+        if (this.input.activePointer.oldPosition && (pointx !== this.input.activePointer.oldPosition.pointx || pointy !== this.input.activePointer.oldPosition.pointy)) {
+          primarygun.rotation = Phaser.Math.Angle.Between(primarygun.x, primarygun.y, this.input.activePointer.worldX , this.input.activePointer.worldY);
+          socket.emit('gunRotatement', { gunrotation: primarygun.rotation})
+          if (this.input.activePointer.worldX > this.player.x) {
+            this.player.flipX = false;
+            this.character.flipX = false;
+            socket.emit('playerflip', { flipped: this.player.flipX})
+          }
+          else {
+            this.player.flipX = true;
+            this.character.flipX = true;
+            socket.emit('playerflip', { flipped: this.player.flipX})
+          }
         }
-        else {
-          this.player.flipX = true;
-          this.character.flipX = true;
-          socket.emit('playerflip', { flipped: this.player.flipX})
+        this.input.activePointer.oldPosition = {
+          pointx: this.input.activePointer.worldX,
+          pointy: this.input.activePointer.worldY,
         }
+      } else {
+smalljoystick.setPosition(this.input.activePointer.worldX, this.input.activePointer.worldY)
+
       }
-      this.input.activePointer.oldPosition = {
-        pointx: this.input.activePointer.worldX,
-        pointy: this.input.activePointer.worldY,
-      }
+     
 //movement
+
         if (CanMove == true) {
-          if (key_D.isDown && this.player.body.velocity.x !== 350) {
+          if (key_D.isDown && this.player.body.velocity.x !== 345) {
                if (this.player.body.velocity.x >= speed) {
                }
                else {
                  this.player.body.velocity.x += acceleration
                }
           }
-          else if (key_A.isDown && this.player.body.velocity.x !== -350) {
+          else if (key_A.isDown && this.player.body.velocity.x !== -345) {
             if (this.player.body.velocity.x <= -speed) {
             }
             else {
@@ -1874,7 +2049,13 @@ for (var i = 0; i < 6; i++) {
           }
         }
 //afterimage
+
         afterimage.setPosition(this.player.x, this.player.y)
+        healthbar.setPosition(this.player.x, this.player.y + 20)
+        name.setPosition(this.player.x, this.player.y - 40)
+        if (cam.x !== this.player.x || cam.y !== this.player.y) {
+          this.physics.moveToObject(cam, this.player, 200, 100);
+        }
        }
     }
 }
