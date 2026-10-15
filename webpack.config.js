@@ -1,11 +1,22 @@
+const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const ignoredWatch = /[\\/](node_modules|DumpStack\.log\.tmp|pagefile\.sys|swapfile\.sys|hiberfil\.sys|System Volume Information|\$RECYCLE\.BIN)([\\/]|$)/;
 
 module.exports = {
+  context: __dirname,
+  resolve: {
+    modules: [path.resolve(__dirname, "node_modules")],
+  },
+
   devServer: {
-  host: 'localhost',
-},
+    host: "localhost",
+    static: {
+      directory: path.join(__dirname, "public"),
+      watch: { ignored: ignoredWatch },
+    },
+  },
   module: {
     rules: [
       {
@@ -41,8 +52,11 @@ module.exports = {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { from: './src/assets', to : 'assets' }
+        { from: path.resolve(__dirname, 'src/assets'), to: 'assets' }
       ]
     })
-  ]
+  ],
+  watchOptions: {
+    ignored: ignoredWatch,
+  },
 };

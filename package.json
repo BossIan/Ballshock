@@ -4,7 +4,7 @@
   "description": "Test",
   "main": "index.js",
   "scripts": {
-    "start": "webpack server --mode development --entry ./src/game.js",
+    "start": "webpack serve --mode development --entry ./src/game.js",
     "build": "webpack --mode production --entry ./src/game.js",
     "dev": "webpack --mode development --entry ./src/game.js"
   },
@@ -28,8 +28,8 @@
     "html-webpack-plugin": "^5.3.2",
     "mini-css-extract-plugin": "^1.6.1",
     "webpack": "^5.40.0",
-    "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^4.15.0"
+    "webpack-cli": "^7.2.3",
+    "webpack-dev-server": "^6.0.0"
   },
   "dependencies": {
     "phaser": "^3.55.2",
