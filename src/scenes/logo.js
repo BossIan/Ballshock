@@ -1,3 +1,4 @@
+var input = document.getElementById('input')
 export default class logo extends Phaser.Scene {
   constructor(){
     super({key: "logo"});
@@ -57,6 +58,8 @@ export default class logo extends Phaser.Scene {
   this.load.audio('SFX_SolFlairGunBullet', 'SFX_SolFlairGunBullet.mp3')
 }
 	create(){
+ 
+
     var self = this;
     var name;
     var savedloadout1 = JSON.parse(localStorage.getItem('loadout1'));
@@ -72,9 +75,19 @@ export default class logo extends Phaser.Scene {
     }
     var file = JSON.parse(localStorage.getItem('name'));
     if (file == null) {
+      if (this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
+        file = 'mobile'
+        console.log(JSON.stringify(file));
+        localStorage.setItem('name',JSON.stringify(file));
+        self.scene.start('menu');
+      }
       console.log(file);
       this.add.text(100, 100, 'Enter your name:', { font: '40px Courier', fill: '#000000' });
-      name = this.add.text(100, 150, '', { font: '40px Courier', fill: '#000000' });+
+      name = this.add.text(100, 150, '', { font: '40px Courier', fill: '#000000' });
+      this.input.on('pointerdown', function () {
+        input.focus()
+      })
+      input.oninput = function(){name.text = input.value};
       this.input.keyboard.on('keydown', function (event) {
           if (event.keyCode === 8 && name.text.length > 0){
             name.text = name.text.substr(0, name.text.length - 1);
@@ -84,6 +97,7 @@ export default class logo extends Phaser.Scene {
               }
             }
             else if (event.keyCode === 13 && name.text.length > 0) {
+              input.blur()
               file = name.text
               console.log(JSON.stringify(file));
               localStorage.setItem('name',JSON.stringify(file));

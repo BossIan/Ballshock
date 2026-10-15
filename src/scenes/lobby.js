@@ -274,16 +274,37 @@ export default class lobby extends Phaser.Scene {
 		createroomrect.isFilled = true;
 		var createroom = this.add.text(718, 1144, "Create Room", {color:"#000000ff",fontSize:"50px"}).setOrigin(0.5, 0.5);
     var username = self.add.text(115, 90, '', {"fontSize":"50px"});
-    socket = io('https://' + address, {
-       reconnection: false,
-       reconnectionDelayMax: 10000,
-      });
+    if (this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
+      socket = io('https://ballshock-server.onrender.com', {
+        reconnection: false,
+        reconnectionDelayMax: 10000,
+       });
+    } else {
+      socket = io('https://' + address, {
+        reconnection: false,
+        reconnectionDelayMax: 10000,
+       });
+    }
+      let connectLayer = self.add.layer().setDepth(60).setVisible(true);
+      let connecttext = self.add.text(1060, 550, 'Connecting to '+ address + ".", {"color":"#FFFFFF","fontSize":"20px","stroke":"#686161ff"}).setOrigin(0.5, 0.5).setScrollFactor(0).setDepth(60).setScale(2, 2);
+      if (address=='ballshock-server.onrender.com' || this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
+        connecttext.text = 'Connecting to Official Server.'
+      }
+       let connect = self.add.rectangle(1060, 600, 400, 200).setScrollFactor(0).setDepth(60).setScale(2, 2);
+       connect.isFilled = true;
+       connect.fillColor = 3223857;
+       connect.isStroked = true;
+       connect.strokeColor = 0;
+       connect.lineWidth = 10;
+       connectLayer.add(connect);
+       connectLayer.add(connecttext)
     socket.off()
     socket.emit('join lobby', savedname)
     socket.on('connect_error', function () {
       disconnect()
     });
     socket.on('currentPlayers', function(usernames){
+      connectLayer.setVisible(false)
       let texts =  ''
       for (var i = 0; i < usernames.length; i++) {
         if (usernames[i] == null) continue

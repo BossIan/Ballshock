@@ -3,12 +3,14 @@ import {roomId} from './lobby'
 import {map} from './room'
 var disconnected = false;
 var smalljoystick;
+//TODO: keyW
 var key_W;
 var key_A;
 var key_S;
 var key_D;
 var key_Space;
 var CanMove
+var mainPointer;
 var speed = 195;
 var acceleration = 15;
 var primarygun;
@@ -143,21 +145,44 @@ export default class multilevel extends Phaser.Scene {
 
     //mobile 
     if (this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
+      var mobileLayer =this.add.layer().setDepth(30).setVisible(false);
       mobile = true
       this.input.addPointer(5);
-      var shootBtn = this.add.image(1320, 790, 'shoot').setOrigin(0, 0.5).setScrollFactor(0).setDepth(30).setInteractive().on('pointerdown', function () {
+      var shootBtn = this.add.image(1320, 790, 'shoot').setOrigin(0, 0.5).setScrollFactor(0).setInteractive().on('pointerdown', function () {
         shootMobile = true
       })
       shootBtn.on('pointerup', function () {
         shootMobile = false;
       })
-      var sprintBtn = this.add.image(1220, 790, 'sprint').setOrigin(0, 0.5).setScrollFactor(0).setDepth(30).setInteractive().on('pointerdown', function () {
-        key_Shift = true;
+      mobileLayer.add(shootBtn)
+      var sprintBtn = this.add.image(1220, 790, 'sprint').setOrigin(0, 0.5).setScrollFactor(0).setInteractive().on('pointerdown', function () {
+        if (CanMove == true) {
+          if (spawned) {
+             if (key_D.isDown) {
+              self.player.setVelocityX(345);
+              self.player.anims.play('dash')
+              afterimage.setPosition(self.player.x , self.player.y)
+              afterimage.setVisible(true)
+              socket.emit('playeranim', { curanim: self.player.anims.currentAnim.key})
+              self.player.on('animationcomplete', function () {
+                afterimage.setVisible(false)
+             })
+            }
+              else if (key_A.isDown) {
+              self.player.setVelocityX(-345);
+              self.player.anims.play('dash')
+              afterimage.setPosition(self.player.x , self.player.y)
+              afterimage.setVisible(true)
+              socket.emit('playeranim', { curanim: self.player.anims.currentAnim.key})
+              self.player.on('animationcomplete', function () {
+                afterimage.setVisible(false)
+             })
+             }
+          }
+         }
       })
-      sprintBtn.on('pointerup', function () {
-        key_Shift = false;
-      })
-      var changeBtn = this.add.image(1060, 790, 'change').setOrigin(0, 0.5).setScrollFactor(0).setDepth(30).setInteractive().on('pointerdown', function () {
+      mobileLayer.add(sprintBtn)
+      var changeBtn = this.add.image(1060, 790, 'change').setOrigin(0, 0.5).setScrollFactor(0).setInteractive().on('pointerdown', function () {
         if (selectedgun == 'secondary') {
           CanMove = true;
           selectedgun = 'primary'
@@ -171,15 +196,20 @@ export default class multilevel extends Phaser.Scene {
           socket.emit('changeloadout', {character: selectedloadout.character, gun: primarygun.texture.key})
         }
       })
-      var joystick = this.add.ellipse(800, 720, 200, 200).setScrollFactor(0).setDepth(30).setInteractive();
-      smalljoystick = this.add.ellipse(800, 720, 50, 50, '#000000').setDepth(30).setVisible(false);
+      mobileLayer.add(changeBtn)
+      var joystick = this.add.ellipse(800, 720, 100, 100).setScrollFactor(0).setInteractive();
+      mobileLayer.add(joystick)
+      smalljoystick = this.add.ellipse(800, 720, 50, 50, '#000000').setVisible(false).setScrollFactor(0);
+      mobileLayer.add(smalljoystick)
       this.input.on('pointermove', function (pointer) {
-        if(!pointer.isDown){
-          self.activeMobile = false
-        }
+
+        
+        
         if(!self.activeMobile) return
-          smalljoystick.setVisible(false)
-         primarygun.rotation = Phaser.Math.Angle.Between(joystick.x, joystick.y, self.input.activePointer.x + 400, self.input.activePointer.y - 200);
+        smalljoystick.setPosition(635+pointer.x/2.5, 360+pointer.y/2.5)
+
+          smalljoystick.setVisible(true)
+         primarygun.rotation = Phaser.Math.Angle.Between(joystick.x, joystick.y, pointer.x + 400, pointer.y - 200);
          socket.emit('gunRotatement', { gunrotation: primarygun.rotation})
             if (joystick.x < self.input.activePointer.x + 400) {
               self.player.flipX = false;
@@ -210,7 +240,32 @@ export default class multilevel extends Phaser.Scene {
               }
           } else if(joystick.y > self.input.activePointer.y -70){
             key_W.isDown = true
-  
+            if (CanMove == true) {
+              if (spawned) {
+                if (self.player.body.touching.left && self.player.body.touching.down != true) {
+                  self.player.setVelocityX(200);
+                  self.player.setVelocityY(-250);
+                  self.player.anims.play('walljump');
+                  afterimage.setPosition(self.player.x , self.player.y)
+                  afterimage.setVisible(true)
+                  socket.emit('playeranim', { curanim: self.player.anims.currentAnim.key})
+                  self.player.on('animationcomplete', function () {
+                    afterimage.setVisible(false)
+                 })
+                }
+                else if (self.player.body.touching.right && self.player.body.touching.down != true) {
+                  self.player.setVelocityX(-200);
+                  self.player.setVelocityY(-250);
+                  self.player.anims.play('walljump');
+                  afterimage.setPosition(self.player.x , self.player.y)
+                  afterimage.setVisible(true)
+                  socket.emit('playeranim', { curanim: self.player.anims.currentAnim.key})
+                  self.player.on('animationcomplete', function () {
+                    afterimage.setVisible(false)
+                 })
+                }
+              }
+            }
           }
           else{
             key_S.isDown = false
@@ -220,7 +275,8 @@ export default class multilevel extends Phaser.Scene {
          }
       }
       )
-      joystick.on('pointerdown', function () {
+      joystick.on('pointerdown', function (pointer) {
+        mainPointer = pointer
         self.activeMobile = true;
       })
       joystick.on('pointerout', function () {
@@ -369,6 +425,9 @@ export default class multilevel extends Phaser.Scene {
                 Health -= SuperchargedFractaldamage
               }
               if (Health <= 0) {
+                if (mobile) {
+                  mobileLayer.setVisible(false)
+                }
                 spawnrect.setVisible(true)
                 spawntext.setVisible(true)
                 loadoutrect.setVisible(true)
@@ -733,6 +792,9 @@ export default class multilevel extends Phaser.Scene {
     spawnrect.setVisible(false)
     loadoutrect.setVisible(false)
     loadouttext.setVisible(false)
+    if (mobile) {
+      mobileLayer.setVisible(true)
+    }
     })
     key_ESC.on('up', function () {
       spawned = false;
@@ -1211,6 +1273,9 @@ export default class multilevel extends Phaser.Scene {
                   if (self.player.active) {
                   Health -= Boomsmithdamage
                   if (Health <= 0) {
+                    if (mobile) {
+                      mobileLayer.setVisible(false)
+                    }
                     spawnrect.setVisible(true)
                     spawntext.setVisible(true)
                     loadoutrect.setVisible(true)
@@ -1994,10 +2059,7 @@ var  shootNow = this.input.activePointer.isDown
           pointx: this.input.activePointer.worldX,
           pointy: this.input.activePointer.worldY,
         }
-      } else {
-smalljoystick.setPosition(this.input.activePointer.worldX, this.input.activePointer.worldY)
-
-      }
+      } 
      
 //movement
 
@@ -2055,6 +2117,14 @@ smalljoystick.setPosition(this.input.activePointer.worldX, this.input.activePoin
         name.setPosition(this.player.x, this.player.y - 40)
         if (cam.x !== this.player.x || cam.y !== this.player.y) {
           this.physics.moveToObject(cam, this.player, 200, 100);
+        }
+        if (!mainPointer?.isDown ){
+          this.activeMobile = false
+          smalljoystick.setVisible(false)
+          key_D.isDown = false
+        key_A.isDown = false
+        key_S.isDown = false
+        key_W.isDown = false
         }
        }
     }

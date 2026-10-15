@@ -5,7 +5,11 @@ export default class enterip extends Phaser.Scene {
     super({key: "enterip"});
   }
   create(){
+
     var self = this;
+    if (this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
+      this.scene.start('lobby');
+    }
     address = JSON.parse(localStorage.getItem('address'));
     var key_ESC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     key_ESC.on('up', function () {
@@ -34,6 +38,7 @@ export default class enterip extends Phaser.Scene {
             self.scene.start('lobby');
           }
           else if (event.keyCode === 13 && ip.text.length == 0) {
+            localStorage.setItem('address',JSON.stringify(ip.text));
             address = 'ballshock-server.onrender.com';
             self.scene.start('lobby');
           }
