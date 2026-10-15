@@ -28,6 +28,7 @@ config = {
     pixelArt: true,
     physics: {
         default: 'arcade',
+        fixedStep: false,
         arcade: {
             debug: false,
             gravity: {y: 800}
